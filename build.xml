@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="basics" default="jar" basedir=".">
+  <property name="lib" value="lib" />
+  <property name="build.classes" location="build/classes" />
+  <property name="build.lib" location="build/lib" />
+
+  <property name="sourcefiles" value="de/saar/**/*.java" />
+  <property name="classfiles" value="de/saar/**/*" />
+
+  <target name="jar" depends="compile">
+    <jar jarfile="${build.lib}/basics.jar">
+      <fileset dir="${build.classes}"
+	       includes="${classfiles}" />
+    </jar>
+  </target>
+
+  
+  <target name="compile" depends="init,-pre-compile,crispterm.unpacked">
+    <javac srcdir="src" destdir="${build.classes}"
+	   debug="true"
+	   includes="${sourcefiles}" source="1.5"
+	   fork="yes" />
+  </target>
+  
+  <target name="-pre-compile">
+    <javacc 
+	javacchome="lib/javacc-4.0/bin/lib"
+	target="src/de/saar/chorus/term/parser/TermParser.jj" />
+  </target>
+
+
+  <target name="init">
+    <mkdir dir="build" />
+    <mkdir dir="${build.classes}" />
+    <mkdir dir="${build.classes}/timestamps-unpackjar" />
+    <mkdir dir="${build.lib}" />
+    <mkdir dir="javadoc"/>
+  </target>
+
+  <target name="javadoc" depends="init">
+    <javadoc destdir="javadoc" sourcepath="src"/>              
+  </target>
+</project>
