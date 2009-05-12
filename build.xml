@@ -16,7 +16,7 @@
   </target>
 
   
-  <target name="compile" depends="init,-pre-compile,crispterm.unpacked">
+  <target name="compile" depends="init,-pre-compile">
     <javac srcdir="src" destdir="${build.classes}"
 	   debug="true"
 	   includes="${sourcefiles}" source="1.5"
