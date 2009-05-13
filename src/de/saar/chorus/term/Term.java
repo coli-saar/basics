@@ -7,10 +7,13 @@
 
 package de.saar.chorus.term;
 
+import java.io.Serializable;
 import java.util.Set;
 
-public abstract class Term {
-    public boolean isVariable() {
+public abstract class Term implements Serializable {
+	private static final long serialVersionUID = -1952637067597465276L;
+
+	public boolean isVariable() {
         return getType() == Type.VARIABLE;
     }
     
