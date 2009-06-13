@@ -30,12 +30,26 @@ public abstract class Term implements Serializable {
     public abstract boolean hasSubterm(Term other);
     
     public abstract Substitution getUnifier(Term other);
-    
+
     public boolean isUnifiableWith(Term other) {
         Substitution subst = getUnifier(other);
         
         return (subst != null) && subst.isValid();
     }
+
+
+    public Substitution match(Term groundTerm) {
+        Substitution ret = new Substitution();
+        if( buildMatchingSubstitution(groundTerm, ret)) {
+            return ret;
+        } else {
+            return null;
+        }
+    }
+
+
+    abstract boolean buildMatchingSubstitution(Term groundTerm, Substitution subst);
+
     
     public abstract Set<Variable> getVariables();
     
@@ -63,7 +77,7 @@ public abstract class Term implements Serializable {
     }
     
     public abstract String toLispString();
-    
+
     
     
     

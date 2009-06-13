@@ -61,4 +61,9 @@ public class Constant extends Term {
 	public String toLispString() {
 		return name;
 	}
+
+    @Override
+    boolean buildMatchingSubstitution(Term groundTerm, Substitution subst) {
+        return equals(groundTerm);
+    }
 }

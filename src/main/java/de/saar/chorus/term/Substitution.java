@@ -94,6 +94,12 @@ public class Substitution implements Cloneable {
         return ret;
     }
 
+    // This method is fast but a bit dangerous, because it simply adds "other"'s assignments to mine, destructively.
+    // This can destroy the invariant that no variable occurs both on the RHS and LHS in this substitution.
+    // It is safe for ground substitutions.
+    public void putAll(Substitution other) {
+        subst.putAll(other.subst);
+    }
 
     public Substitution concatenate(Substitution other) {
         Substitution ret = (Substitution) clone();

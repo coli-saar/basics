@@ -74,6 +74,18 @@ public class Variable extends Term {
 		return name;
 	}
 
+    @Override
+    boolean buildMatchingSubstitution(Term groundTerm, Substitution subst) {
+        Term me = subst.apply(this);
+
+        if( me instanceof Variable ) {
+            subst.addSubstitution(this, groundTerm);
+            return true;
+        } else {
+            return me.equals(groundTerm);
+        }
+    }
+
 
 
 }

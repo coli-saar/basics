@@ -159,4 +159,29 @@ public class Compound extends Term {
 
         return buf.toString();
     }
+
+    @Override
+    boolean buildMatchingSubstitution(Term groundTerm, Substitution subst) {
+        if( groundTerm instanceof Compound ) {
+            Compound other = (Compound) groundTerm;
+
+            if(! getLabel().equals(other.getLabel())) {
+                return false;
+            }
+
+            if( getSubterms().size() != other.getSubterms().size() ) {
+                return false;
+            }
+
+            for( int i = 0; i < getSubterms().size(); i++ ) {
+                if( !getSubterms().get(i).buildMatchingSubstitution(other.getSubterms().get(i), subst)) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
