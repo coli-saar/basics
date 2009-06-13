@@ -207,7 +207,9 @@ public class Substitution implements Cloneable {
         return subst.containsKey(v);
     }
 
-
-
+    @Override
+    public int hashCode() {
+        return subst.hashCode();
+    }
 
 }

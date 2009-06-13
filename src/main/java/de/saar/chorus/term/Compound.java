@@ -4,7 +4,6 @@
  * Copyright (c) 2006 Alexander Koller
  *
  */
-
 package de.saar.chorus.term;
 
 import java.util.Arrays;
@@ -29,22 +28,18 @@ public class Compound extends Term {
         this(label, Arrays.asList(subterms));
     }
 
-
     public String getLabel() {
         return label;
     }
-
 
     public List<Term> getSubterms() {
         return subterms;
     }
 
-
     @Override
     public String toString() {
         return label + "(" + StringTools.join(subterms, ",") + ")";
     }
-
 
     @Override
     public Type getType() {
@@ -52,11 +47,11 @@ public class Compound extends Term {
     }
 
     private boolean isLocallyEqual(Compound other) {
-        if( !label.equals(other.label)) {
+        if (!label.equals(other.label)) {
             return false;
         }
 
-        if( subterms.size() != other.subterms.size() ) {
+        if (subterms.size() != other.subterms.size()) {
             return false;
         }
 
@@ -68,12 +63,12 @@ public class Compound extends Term {
         if (o instanceof Compound) {
             Compound co = (Compound) o;
 
-            if( !isLocallyEqual(co)) {
+            if (!isLocallyEqual(co)) {
                 return false;
             }
 
-            for( int i = 0; i < subterms.size(); i++ ) {
-                if( !subterms.get(i).equals(co.subterms.get(i))) {
+            for (int i = 0; i < subterms.size(); i++) {
+                if (!subterms.get(i).equals(co.subterms.get(i))) {
                     return false;
                 }
             }
@@ -84,19 +79,18 @@ public class Compound extends Term {
         }
     }
 
+    @Override
+    public int hashCode() {
+        return hashcode;
+    }
 
     @Override
-	public int hashCode() {
-        return hashcode;
-	}
-
-	@Override
     public boolean hasSubterm(Term other) {
-        if( equals(other)) {
+        if (equals(other)) {
             return true;
         } else {
-            for( Term subterm : subterms ) {
-                if( subterm.hasSubterm(other)) {
+            for (Term subterm : subterms) {
+                if (subterm.hasSubterm(other)) {
                     return true;
                 }
             }
@@ -107,35 +101,35 @@ public class Compound extends Term {
 
     @Override
     public Substitution getUnifier(Term other) {
-        switch(other.getType()) {
-        case VARIABLE:
-            return new Substitution((Variable) other, this);
+        switch (other.getType()) {
+            case VARIABLE:
+                return new Substitution((Variable) other, this);
 
-        case CONSTANT:
-            return null;
-
-        case COMPOUND:
-            Compound com = (Compound) other;
-            Substitution subst = new Substitution();
-
-            if( !isLocallyEqual(com) ) {
+            case CONSTANT:
                 return null;
-            }
 
-            for( int i = 0; i < subterms.size(); i++ ) {
-                Substitution here = subterms.get(i).getUnifier(com.subterms.get(i));
+            case COMPOUND:
+                Compound com = (Compound) other;
+                Substitution subst = new Substitution();
 
-                if( here == null ) {
+                if (!isLocallyEqual(com)) {
                     return null;
                 }
 
-                subst = subst.concatenate(here);
-                if( !subst.isValid() ) {
-                    return null;
-                }
-            }
+                for (int i = 0; i < subterms.size(); i++) {
+                    Substitution here = subterms.get(i).getUnifier(com.subterms.get(i));
 
-            return subst;
+                    if (here == null) {
+                        return null;
+                    }
+
+                    subst = subst.concatenate(here);
+                    if (!subst.isValid()) {
+                        return null;
+                    }
+                }
+
+                return subst;
         }
 
         // unreachable
@@ -146,24 +140,23 @@ public class Compound extends Term {
     public Set<Variable> getVariables() {
         Set<Variable> ret = new HashSet<Variable>();
 
-        for( Term subterm : subterms ) {
+        for (Term subterm : subterms) {
             ret.addAll(subterm.getVariables());
         }
 
         return ret;
     }
 
-	@Override
-	public String toLispString() {
-		StringBuffer buf = new StringBuffer("(" + label);
+    @Override
+    public String toLispString() {
+        StringBuffer buf = new StringBuffer("(" + label);
 
-		for( Term subterm : subterms ) {
-			buf.append(" " + subterm.toLispString());
-		}
+        for (Term subterm : subterms) {
+            buf.append(" " + subterm.toLispString());
+        }
 
-		buf.append(")");
+        buf.append(")");
 
-		return buf.toString();
-	}
-
+        return buf.toString();
+    }
 }
