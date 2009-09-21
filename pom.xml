@@ -5,7 +5,7 @@
     <groupId>de.saar.coli</groupId>
     <artifactId>basics</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.1</version>
     <name>basics</name>
     <url>http://maven.apache.org</url>
 
