@@ -16,7 +16,8 @@ public class Draw {
     private static final double alpha = Math.PI / 8;
 
     /**
-     * Draws an arrow. Used by arcs.
+     * Draws an arrow. This is based on code by Alexander Gruenewald, see
+     * http://page.mi.fu-berlin.de/trieglaf/PNK2e/javadoc/de/huberlin/informatik/pnk/editor/Draw.html
      */
     public static Point arrow(int x1, int y1, int x2, int y2, int size, Graphics g) {
         double dx;
