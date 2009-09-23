@@ -5,7 +5,6 @@
 package de.saar.basic.swing;
 
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.Polygon;
 
 /**
@@ -19,7 +18,7 @@ public class Draw {
      * Draws an arrow. This is based on code by Alexander Gruenewald, see
      * http://page.mi.fu-berlin.de/trieglaf/PNK2e/javadoc/de/huberlin/informatik/pnk/editor/Draw.html
      */
-    public static Point arrow(int x1, int y1, int x2, int y2, int size, Graphics g) {
+    public static void arrow(int x1, int y1, int x2, int y2, int size, Graphics g) {
         double dx;
         double dy;
         double d;
@@ -54,8 +53,6 @@ public class Draw {
 
         // draw line
         g.drawLine(x1, y1, x2 - (int) ((dx * hook)), y2 - (int) ((dy * hook)));
-
-        return new Point(x2 - (int) ((dx * hook)), y2 - (int) ((dy * hook)));
     }
 
     /*
