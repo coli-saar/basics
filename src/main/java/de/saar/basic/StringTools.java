@@ -44,4 +44,23 @@ public class StringTools {
         
     }
 
+    public static String removeUmlauts(String stringWithUmlauts) {
+        StringBuilder buf = new StringBuilder();
+
+        for( int i = 0; i < stringWithUmlauts.length(); i++ ) {
+            switch(stringWithUmlauts.charAt(i)) {
+                case 'Š': buf.append("ae"); break;
+                case 'š': buf.append("oe"); break;
+                case 'Ÿ': buf.append("ue"); break;
+                case '€': buf.append("Ae"); break;
+                case '…': buf.append("Oe"); break;
+                case '†': buf.append("Ue"); break;
+                case '§': buf.append("ss"); break;
+                default: buf.append(stringWithUmlauts.charAt(i));
+            }
+        }
+
+        return buf.toString();
+    }
+
 }

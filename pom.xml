@@ -5,7 +5,7 @@
     <groupId>de.saar.coli</groupId>
     <artifactId>basics</artifactId>
     <packaging>jar</packaging>
-    <version>1.2</version>
+    <version>1.2.1</version>
     <name>basics</name>
     <url>http://maven.apache.org</url>
 
@@ -14,6 +14,20 @@
             <groupId>com.lowagie</groupId>
             <artifactId>itext</artifactId>
             <version>2.0.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy.maven.runtime</groupId>
+            <artifactId>gmaven-runtime-1.6</artifactId>
+            <version>1.0-rc-5</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.5</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -38,6 +52,19 @@
                         <id>javacc</id>
                         <goals>
                             <goal>javacc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+             <plugin>
+                <groupId>org.codehaus.groovy.maven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generateTestStubs</goal>
+                            <goal>testCompile</goal>
                         </goals>
                     </execution>
                 </executions>
