@@ -197,6 +197,11 @@ public class Substitution implements Cloneable {
         return ret;
     }
 
+    public void clear() {
+        subst.clear();
+        valid = true;
+    }
+
     private static void copy(Substitution from, Substitution to) {
         to.valid = from.valid;
 
@@ -204,6 +209,9 @@ public class Substitution implements Cloneable {
         to.subst.putAll(from.subst);
     }
 
+    public void copyTo(Substitution to) {
+        copy(this, to);
+    }
 
     public void remove(Variable v) {
         subst.remove(v);
