@@ -75,7 +75,7 @@
         <repository>
             <id>ecl-repository</id>
             <name>Coli ECL Maven repository</name>
-            <url>scp://httpd/web/www.coli.uni-saarland.de/html/projects/ecl/maven2/releases</url>
+            <url>scp://httpd.coli.uni-saarland.de/web/www.coli.uni-saarland.de/html/projects/ecl/maven2/releases</url>
         </repository>
 
         <downloadUrl>http://www.coli.uni-saarland.de/projects/ecl/maven2/releases</downloadUrl>
