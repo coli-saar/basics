@@ -49,13 +49,13 @@ public class StringTools {
 
         for( int i = 0; i < stringWithUmlauts.length(); i++ ) {
             switch(stringWithUmlauts.charAt(i)) {
-                case 'Š': buf.append("ae"); break;
-                case 'š': buf.append("oe"); break;
-                case 'Ÿ': buf.append("ue"); break;
-                case '€': buf.append("Ae"); break;
-                case '…': buf.append("Oe"); break;
-                case '†': buf.append("Ue"); break;
-                case '§': buf.append("ss"); break;
+                case '\u00E4': buf.append("ae"); break;
+                case '\u00F6': buf.append("oe"); break;
+                case '\u00FC': buf.append("ue"); break;
+                case '\u00C4': buf.append("Ae"); break;
+                case '\u00D6': buf.append("Oe"); break;
+                case '\u00DC': buf.append("Ue"); break;
+                case '\u00DF': buf.append("ss"); break;
                 default: buf.append(stringWithUmlauts.charAt(i));
             }
         }
