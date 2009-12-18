@@ -1,5 +1,5 @@
 options {
-	LOOKAHEAD = 2;
+	LOOKAHEAD = 3;
 	STATIC = false;
     JDK_VERSION = "1.5";
 }
@@ -52,6 +52,8 @@ Term term() :
         	 ")" {
 		return new Compound(label.image, subterms);
 	}
+	
+	| label = <ATOM> "(" ")" { return new Compound(label.image, subterms); }
 	
   | label = <ATOM> {
 	  return new Constant(label.image);
