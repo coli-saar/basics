@@ -48,7 +48,7 @@ public abstract class Term implements Serializable {
     }
 
 
-    abstract boolean buildMatchingSubstitution(Term groundTerm, Substitution subst);
+    protected abstract boolean buildMatchingSubstitution(Term groundTerm, Substitution subst);
 
     
     public abstract Set<Variable> getVariables();

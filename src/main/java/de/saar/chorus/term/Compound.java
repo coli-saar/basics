@@ -161,7 +161,7 @@ public class Compound extends Term {
     }
 
     @Override
-    boolean buildMatchingSubstitution(Term groundTerm, Substitution subst) {
+    protected boolean buildMatchingSubstitution(Term groundTerm, Substitution subst) {
         if( groundTerm instanceof Compound ) {
             Compound other = (Compound) groundTerm;
 

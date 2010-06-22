@@ -63,7 +63,7 @@ public class Constant extends Term {
 	}
 
     @Override
-    boolean buildMatchingSubstitution(Term groundTerm, Substitution subst) {
+    protected boolean buildMatchingSubstitution(Term groundTerm, Substitution subst) {
         return equals(groundTerm);
     }
 }

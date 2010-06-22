@@ -75,7 +75,7 @@ public class Variable extends Term {
 	}
 
     @Override
-    boolean buildMatchingSubstitution(Term groundTerm, Substitution subst) {
+    protected boolean buildMatchingSubstitution(Term groundTerm, Substitution subst) {
         Term me = subst.apply(this);
 
         if( me instanceof Variable ) {
