@@ -7,6 +7,7 @@
 
 package de.saar.chorus.term;
 
+import de.saar.basic.tree.Tree;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -86,6 +87,8 @@ public class Variable extends Term {
         }
     }
 
-
-
+    @Override
+    protected void buildTerm(Tree<Term> tree, String parent) {
+        tree.addNode(this, parent);
+    }
 }

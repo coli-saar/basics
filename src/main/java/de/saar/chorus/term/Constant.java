@@ -7,6 +7,7 @@
 
 package de.saar.chorus.term;
 
+import de.saar.basic.tree.Tree;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,5 +66,10 @@ public class Constant extends Term {
     @Override
     protected boolean buildMatchingSubstitution(Term groundTerm, Substitution subst) {
         return equals(groundTerm);
+    }
+
+    @Override
+    protected void buildTerm(Tree<Term> tree, String parent) {
+        tree.addNode(this, parent);
     }
 }

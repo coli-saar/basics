@@ -6,6 +6,8 @@
 package de.saar.basic.tree
 
 import org.junit.*;
+import de.saar.chorus.term.*;
+import de.saar.chorus.term.parser.*;
 
 /**
  *
@@ -60,6 +62,13 @@ class TreeTest {
         String n4 = tree.addNode("l3", n2);
 
         assert tree.getNodesInDfsOrder().equals([n4, n2, n3, root]);
+    }
+
+    @Test
+    public void testTermToTree() {
+        Term term = TermParser.parse("f(g(a),b)");
+        Tree<Term> tree = term.toTree();
+        assert tree.toString().equals("n1:f(n2:g(n3:a ) n4:b )") : tree.toString();
     }
 }
 

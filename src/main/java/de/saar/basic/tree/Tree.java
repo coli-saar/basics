@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 public class Tree<E> {
+
     private final Map<String, List<String>> children;
     private final Map<String, String> parents;
-    private final Map<String,E> nodeLabels;
+    private final Map<String, E> nodeLabels;
     private String root;
     private int gensymNext;
 
@@ -65,6 +66,7 @@ public class Tree<E> {
     }
 
     private static class NodeCollectingTreeVisitor extends TreeVisitor<Void, Void> {
+
         private List<String> collectHere;
 
         public NodeCollectingTreeVisitor(List<String> collectHere) {
@@ -84,7 +86,6 @@ public class Tree<E> {
         dfs(v);
         return collect;
     }
-
 
     public List<String> getChildren(String node) {
         return children.get(node);
@@ -112,7 +113,8 @@ public class Tree<E> {
     public List<String> getNodesInDfsOrder() {
         final List<String> ret = new ArrayList<String>();
 
-        dfs(new TreeVisitor<Void,Void>() {
+        dfs(new TreeVisitor<Void, Void>() {
+
             @Override
             public Void combine(String node, List<Void> childrenValues) {
                 ret.add(node);
@@ -160,6 +162,6 @@ public class Tree<E> {
     }
 
     public String getNodeDescription(String node) {
-        return node;
+        return node + ":" + getLabel(node);
     }
 }

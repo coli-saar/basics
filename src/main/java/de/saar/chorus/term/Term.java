@@ -4,59 +4,56 @@
  * Copyright (c) 2006 Alexander Koller
  *  
  */
-
 package de.saar.chorus.term;
 
+import de.saar.basic.tree.Tree;
 import java.io.Serializable;
 import java.util.Set;
 
 public abstract class Term implements Serializable {
-	private static final long serialVersionUID = -1952637067597465276L;
+    private static final long serialVersionUID = -1952637067597465276L;
 
-	public boolean isVariable() {
+    public boolean isVariable() {
         return getType() == Type.VARIABLE;
     }
-    
+
     public boolean isConstant() {
         return getType() == Type.CONSTANT;
     }
-    
+
     public boolean isCompound() {
         return getType() == Type.COMPOUND;
     }
-    
+
     public abstract Type getType();
-    
+
     public abstract boolean hasSubterm(Term other);
-    
+
     public abstract Substitution getUnifier(Term other);
 
     public boolean isUnifiableWith(Term other) {
         Substitution subst = getUnifier(other);
-        
+
         return (subst != null) && subst.isValid();
     }
 
-
     public Substitution match(Term groundTerm) {
         Substitution ret = new Substitution();
-        if( buildMatchingSubstitution(groundTerm, ret)) {
+        if (buildMatchingSubstitution(groundTerm, ret)) {
             return ret;
         } else {
             return null;
         }
     }
 
-
     protected abstract boolean buildMatchingSubstitution(Term groundTerm, Substitution subst);
 
-    
     public abstract Set<Variable> getVariables();
-    
+
     public Term unify(Term other) {
         Substitution mgu = getUnifier(other);
-        
-        if( mgu == null ) {
+
+        if (mgu == null) {
             return null;
         } else {
             return mgu.apply(this);
@@ -67,22 +64,23 @@ public abstract class Term implements Serializable {
     public int hashCode() {
         return toString().hashCode();
     }
-    
+
     public Substitution substFor(Variable x) {
         return new Substitution(x, this);
     }
-    
+
     public Substitution substFor(String varname) {
         return substFor(new Variable(varname));
     }
-    
+
     public abstract String toLispString();
-
     
     
+    public Tree<Term> toTree() {
+        Tree<Term> ret = new Tree<Term>();        
+        buildTerm(ret, null);        
+        return ret;
+    }    
     
-    
-    
-    
-
+    protected abstract void buildTerm(Tree<Term> tree, String parent);
 }
