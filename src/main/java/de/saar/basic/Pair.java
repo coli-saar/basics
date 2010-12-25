@@ -18,5 +18,35 @@ public class Pair<E,F> {
         this.right = right;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Pair<E, F> other = (Pair<E, F>) obj;
+        if (this.left != other.left && (this.left == null || !this.left.equals(other.left))) {
+            return false;
+        }
+        if (this.right != other.right && (this.right == null || !this.right.equals(other.right))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        return hash;
+    }
+
+
+    @Override
+    public String toString() {
+        return left + "," + right;
+    }
+
     
 }

@@ -7,10 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Tree<E> {
-
-    private final Map<String, List<String>> children;
-    private final Map<String, String> parents;
-    private final Map<String, E> nodeLabels;
+    private Map<String, List<String>> children;
+    private Map<String, String> parents;
+    private Map<String, E> nodeLabels;
     private String root;
     private int gensymNext;
 
@@ -20,6 +19,18 @@ public class Tree<E> {
         nodeLabels = new HashMap<String, E>();
         gensymNext = 1;
         root = null;
+    }
+
+    public Tree<E> subtree(String node) {
+        Tree<E> ret = new Tree<E>();
+
+        ret.children = children;
+        ret.parents = parents;
+        ret.nodeLabels = nodeLabels;
+        ret.root = node;
+        ret.gensymNext = gensymNext;
+
+        return ret;
     }
 
     private String gensym() {
