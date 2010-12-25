@@ -70,5 +70,14 @@ class TreeTest {
         Tree<Term> tree = term.toTree();
         assert tree.toString().equals("n1:f(n2:g(n3:a ) n4:b )") : tree.toString();
     }
+
+    @Test
+    public void testTreeToTerm() {
+        Term term = TermParser.parse("f(g(a),b)");
+        Tree<Term> tree = term.toTree();
+        Term decoded = tree.toTerm();
+
+        assert term.equals(decoded);
+    }
 }
 

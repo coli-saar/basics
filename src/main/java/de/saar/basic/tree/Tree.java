@@ -1,5 +1,8 @@
 package de.saar.basic.tree;
 
+import de.saar.chorus.term.Compound;
+import de.saar.chorus.term.Constant;
+import de.saar.chorus.term.Term;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -174,5 +177,36 @@ public class Tree<E> {
 
     public String getNodeDescription(String node) {
         return node + ":" + getLabel(node);
+    }
+
+    public void insert(final Tree<E> subtree, final String parent) {
+        subtree.dfs(new TreeVisitor<String,Void>() {
+            @Override
+            public String getRootValue() {
+                return parent;
+            }
+
+            @Override
+            public String visit(String node, String data) {
+                String nodeHere = Tree.this.addNode(subtree.getLabel(node), data);
+                return nodeHere;
+            }
+        });
+    }
+
+    public Term toTerm() {
+        return toTerm(getRoot());
+    }
+    
+    private Term toTerm(String node) {
+        if( getChildren(node).isEmpty() ) {
+            return new Constant(getLabel(node).toString());
+        } else {
+            List<Term> sub = new ArrayList<Term>();
+            for( String child : getChildren(node)) {
+                sub.add(toTerm(child));
+            }
+            return new Compound(getLabel(node).toString(), sub);
+        }
     }
 }
