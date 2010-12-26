@@ -6,6 +6,7 @@
  */
 package de.saar.chorus.term;
 
+import de.saar.basic.StringOrVariable;
 import de.saar.basic.tree.Tree;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -187,8 +188,8 @@ public class Compound extends Term {
     }
 
     @Override
-    protected void buildTerm(Tree<Term> tree, String parent) {
-        String nodeHere = tree.addNode(new Constant(getLabel()), parent);
+    protected void buildTerm(Tree<StringOrVariable> tree, String parent) {
+        String nodeHere = tree.addNode(new StringOrVariable(getLabel(), false), parent);
 
         for( Term child : getSubterms() ) {
             child.buildTerm(tree, nodeHere);

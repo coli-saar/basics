@@ -6,6 +6,7 @@
  */
 package de.saar.chorus.term;
 
+import de.saar.basic.StringOrVariable;
 import de.saar.basic.tree.Tree;
 import java.io.Serializable;
 import java.util.Set;
@@ -76,11 +77,11 @@ public abstract class Term implements Serializable {
     public abstract String toLispString();
     
     
-    public Tree<Term> toTree() {
-        Tree<Term> ret = new Tree<Term>();        
-        buildTerm(ret, null);        
+    public Tree<StringOrVariable> toTree() {
+        Tree<StringOrVariable> ret = new Tree<StringOrVariable>();
+        buildTerm(ret, null);
         return ret;
     }    
     
-    protected abstract void buildTerm(Tree<Term> tree, String parent);
+    protected abstract void buildTerm(Tree<StringOrVariable> tree, String parent);
 }
