@@ -209,4 +209,41 @@ public class Tree<E> {
             return new Compound(getLabel(node).toString(), sub);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if( ! (o instanceof Tree) ) {
+            return false;
+        }
+        
+        Tree other = (Tree) o;
+        return equals(getRoot(), other.getRoot(), other);
+    }
+
+    @Override
+    public int hashCode() {
+        // TODO - optimize this by caching toString result
+        return toString().hashCode();
+    }
+
+    private boolean equals(String node, String nodeOther, Tree<E> treeOther) {
+        if( ! getLabel(node).equals(treeOther.getLabel(nodeOther)) ) {
+            return false;
+        }
+
+        List<String> children = getChildren(node);
+        List<String> childrenOther = treeOther.getChildren(nodeOther);
+
+        if( children.size() != childrenOther.size()) {
+            return false;
+        }
+
+        for( int i = 0; i < children.size(); i++ ) {
+            if( ! equals(children.get(i), childrenOther.get(i), treeOther) ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
