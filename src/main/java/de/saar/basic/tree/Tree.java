@@ -157,26 +157,26 @@ public class Tree<E> {
         if (root == null) {
             return "<empty>";
         } else {
-            printAsString(root, buf);
+            printAsString(root, false, buf);
             return buf.toString();
         }
     }
 
-    private void printAsString(String node, StringBuffer buf) {
-        buf.append(getNodeDescription(node));
+    private void printAsString(String node, boolean printNodeNames, StringBuffer buf) {
+        buf.append(getNodeDescription(node, printNodeNames));
 
         if (!children.get(node).isEmpty()) {
             buf.append("(");
             for (String child : children.get(node)) {
-                printAsString(child, buf);
+                printAsString(child, printNodeNames, buf);
                 buf.append(" ");
             }
             buf.append(")");
         }
     }
 
-    public String getNodeDescription(String node) {
-        return node + ":" + getLabel(node);
+    public String getNodeDescription(String node, boolean printNodeName) {
+        return (printNodeName?(node + ":"):"") + getLabel(node);
     }
 
     public void insert(final Tree<E> subtree, final String parent) {
@@ -228,6 +228,7 @@ public class Tree<E> {
 
     private boolean equals(String node, String nodeOther, Tree<E> treeOther) {
         if( ! getLabel(node).equals(treeOther.getLabel(nodeOther)) ) {
+//            System.err.println("mismatch at " + node + "/" + nodeOther +": '" + getLabel(node) + "'(" + getLabel(node).getClass() + ") - '" + treeOther.getLabel(nodeOther) + "' (" + treeOther.getLabel(nodeOther).getClass());
             return false;
         }
 
@@ -235,6 +236,7 @@ public class Tree<E> {
         List<String> childrenOther = treeOther.getChildren(nodeOther);
 
         if( children.size() != childrenOther.size()) {
+//            System.err.println("size at " + node + "/" + nodeOther);
             return false;
         }
 
