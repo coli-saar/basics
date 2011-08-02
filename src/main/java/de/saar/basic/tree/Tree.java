@@ -80,7 +80,6 @@ public class Tree<E> {
     }
 
     private static class NodeCollectingTreeVisitor extends TreeVisitor<Void, Void> {
-
         private List<String> collectHere;
 
         public NodeCollectingTreeVisitor(List<String> collectHere) {
@@ -128,7 +127,6 @@ public class Tree<E> {
         final List<String> ret = new ArrayList<String>();
 
         dfs(new TreeVisitor<Void, Void>() {
-
             @Override
             public Void combine(String node, List<Void> childrenValues) {
                 ret.add(node);
@@ -163,24 +161,29 @@ public class Tree<E> {
     }
 
     private void printAsString(String node, boolean printNodeNames, StringBuffer buf) {
+        boolean first = true;
         buf.append(getNodeDescription(node, printNodeNames));
 
         if (!children.get(node).isEmpty()) {
             buf.append("(");
             for (String child : children.get(node)) {
+                if (first) {
+                    first = false;
+                } else {
+                    buf.append(" ");
+                }
                 printAsString(child, printNodeNames, buf);
-                buf.append(" ");
             }
             buf.append(")");
         }
     }
 
     public String getNodeDescription(String node, boolean printNodeName) {
-        return (printNodeName?(node + ":"):"") + getLabel(node);
+        return (printNodeName ? (node + ":") : "") + getLabel(node);
     }
 
     public void insert(final Tree<E> subtree, final String parent) {
-        subtree.dfs(new TreeVisitor<String,Void>() {
+        subtree.dfs(new TreeVisitor<String, Void>() {
             @Override
             public String getRootValue() {
                 return parent;
@@ -197,13 +200,13 @@ public class Tree<E> {
     public Term toTerm() {
         return toTerm(getRoot());
     }
-    
+
     private Term toTerm(String node) {
-        if( getChildren(node).isEmpty() ) {
+        if (getChildren(node).isEmpty()) {
             return new Constant(getLabel(node).toString());
         } else {
             List<Term> sub = new ArrayList<Term>();
-            for( String child : getChildren(node)) {
+            for (String child : getChildren(node)) {
                 sub.add(toTerm(child));
             }
             return new Compound(getLabel(node).toString(), sub);
@@ -212,10 +215,10 @@ public class Tree<E> {
 
     @Override
     public boolean equals(Object o) {
-        if( ! (o instanceof Tree) ) {
+        if (!(o instanceof Tree)) {
             return false;
         }
-        
+
         Tree other = (Tree) o;
         return equals(getRoot(), other.getRoot(), other);
     }
@@ -227,7 +230,7 @@ public class Tree<E> {
     }
 
     private boolean equals(String node, String nodeOther, Tree<E> treeOther) {
-        if( ! getLabel(node).equals(treeOther.getLabel(nodeOther)) ) {
+        if (!getLabel(node).equals(treeOther.getLabel(nodeOther))) {
 //            System.err.println("mismatch at " + node + "/" + nodeOther +": '" + getLabel(node) + "'(" + getLabel(node).getClass() + ") - '" + treeOther.getLabel(nodeOther) + "' (" + treeOther.getLabel(nodeOther).getClass());
             return false;
         }
@@ -235,13 +238,13 @@ public class Tree<E> {
         List<String> children = getChildren(node);
         List<String> childrenOther = treeOther.getChildren(nodeOther);
 
-        if( children.size() != childrenOther.size()) {
+        if (children.size() != childrenOther.size()) {
 //            System.err.println("size at " + node + "/" + nodeOther);
             return false;
         }
 
-        for( int i = 0; i < children.size(); i++ ) {
-            if( ! equals(children.get(i), childrenOther.get(i), treeOther) ) {
+        for (int i = 0; i < children.size(); i++) {
+            if (!equals(children.get(i), childrenOther.get(i), treeOther)) {
                 return false;
             }
         }
