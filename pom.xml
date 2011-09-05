@@ -70,13 +70,22 @@
                 </executions>
             </plugin>
         </plugins>
+
+
+		<extensions>
+		  <extension>
+		    <groupId>org.apache.maven.wagon</groupId>
+		    <artifactId>wagon-ssh-external</artifactId>
+		    <version>1.0-beta-6</version>
+		  </extension>
+		</extensions>
     </build>
 
     <distributionManagement>
         <repository>
             <id>ecl-repository</id>
             <name>Coli ECL Maven repository</name>
-            <url>scp://httpd.coli.uni-saarland.de/web/www.coli.uni-saarland.de/html/projects/ecl/maven2/releases</url>
+	    <url>scpexe://httpd.coli.uni-saarland.de/web/www.coli.uni-saarland.de/html/projects/ecl/maven2/releases</url>
         </repository>
 
         <downloadUrl>http://www.coli.uni-saarland.de/projects/ecl/maven2/releases</downloadUrl>
