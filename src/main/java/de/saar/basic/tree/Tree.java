@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Tree<E> {
+public class Tree<E>  {
     private Map<String, List<String>> children;
     private Map<String, String> parents;
     private Map<String, E> nodeLabels;
@@ -23,6 +23,22 @@ public class Tree<E> {
         gensymNext = 1;
         root = null;
     }
+
+    public Tree<E> copy() {
+        Tree<E> ret = new Tree<E>();
+        
+        for( String k : children.keySet() ) {
+            ret.children.put(k, new ArrayList<String>(children.get(k)));
+        }
+        ret.parents.putAll(parents);
+        ret.nodeLabels.putAll(nodeLabels);
+        ret.root = root;
+        ret.gensymNext = gensymNext;
+        
+        return ret;
+    }
+    
+    
 
     public Tree<E> subtree(String node) {
         Tree<E> ret = new Tree<E>();
@@ -231,7 +247,7 @@ public class Tree<E> {
 
     private boolean equals(String node, String nodeOther, Tree<E> treeOther) {
         if (!getLabel(node).equals(treeOther.getLabel(nodeOther))) {
-//            System.err.println("mismatch at " + node + "/" + nodeOther +": '" + getLabel(node) + "'(" + getLabel(node).getClass() + ") - '" + treeOther.getLabel(nodeOther) + "' (" + treeOther.getLabel(nodeOther).getClass());
+            System.err.println("mismatch at " + node + "/" + nodeOther +": '" + getLabel(node) + "'(" + getLabel(node).getClass() + ") - '" + treeOther.getLabel(nodeOther) + "' (" + treeOther.getLabel(nodeOther).getClass());
             return false;
         }
 
