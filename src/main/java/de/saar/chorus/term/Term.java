@@ -77,11 +77,19 @@ public abstract class Term implements Serializable {
     public abstract String toLispString();
     
     
-    public Tree<StringOrVariable> toTree() {
+    public Tree<StringOrVariable> toTreeWithVariables() {
         Tree<StringOrVariable> ret = new Tree<StringOrVariable>();
-        buildTerm(ret, null);
+        buildTermWithVariables(ret, null);
         return ret;
     }    
     
-    protected abstract void buildTerm(Tree<StringOrVariable> tree, String parent);
+    protected abstract void buildTermWithVariables(Tree<StringOrVariable> tree, String parent);
+    protected abstract void buildTerm(Tree<String> tree, String parent);
+    
+    public Tree<String> toTree() {
+        Tree<String> ret = new Tree<String>();
+        buildTerm(ret, null);
+        return ret;
+    }
+    
 }

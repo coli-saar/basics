@@ -70,7 +70,12 @@ public class Constant extends Term {
     }
 
     @Override
-    protected void buildTerm(Tree<StringOrVariable> tree, String parent) {
+    protected void buildTermWithVariables(Tree<StringOrVariable> tree, String parent) {
         tree.addNode(new StringOrVariable(name, false), parent);
+    }
+
+    @Override
+    protected void buildTerm(Tree<String> tree, String parent) {
+        tree.addNode(name, parent);
     }
 }

@@ -188,8 +188,17 @@ public class Compound extends Term {
     }
 
     @Override
-    protected void buildTerm(Tree<StringOrVariable> tree, String parent) {
+    protected void buildTermWithVariables(Tree<StringOrVariable> tree, String parent) {
         String nodeHere = tree.addNode(new StringOrVariable(getLabel(), false), parent);
+
+        for( Term child : getSubterms() ) {
+            child.buildTermWithVariables(tree, nodeHere);
+        }
+    }
+
+    @Override
+    protected void buildTerm(Tree<String> tree, String parent) {
+        String nodeHere = tree.addNode(getLabel(), parent);
 
         for( Term child : getSubterms() ) {
             child.buildTerm(tree, nodeHere);
