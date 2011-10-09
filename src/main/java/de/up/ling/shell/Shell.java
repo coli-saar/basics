@@ -86,7 +86,7 @@ public class Shell {
                 Object[] argArray = new Object[args.size()];
                 int argIndex = 0;
                 for (Object arg : args) {
-                    argClasses[argIndex] = arg.getClass();
+                    argClasses[argIndex] = (arg == null) ? Object.class : arg.getClass();
                     argArray[argIndex] = arg;
                     argIndex++;
                 }

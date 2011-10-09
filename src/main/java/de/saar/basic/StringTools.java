@@ -98,10 +98,17 @@ public class StringTools {
     public static String slurp(Reader reader) throws IOException {
         String newLine = System.getProperty("line.separator");
         BufferedReader br = new BufferedReader(reader);
+        boolean first = true;
 
         StringBuilder sb = new StringBuilder();
         for (String line = br.readLine(); line != null; line = br.readLine()) {
-            sb.append(line).append(newLine);
+            if( first ) {
+                first = false;
+            } else {
+                sb.append(newLine);
+            }
+            
+            sb.append(line);
         }
         
         reader.close();
