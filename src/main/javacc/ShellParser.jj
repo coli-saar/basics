@@ -1,0 +1,134 @@
+/**
+ * JavaCC file
+ */
+
+
+options {
+  JDK_VERSION = "1.5";
+  STATIC = false;
+  LOOKAHEAD=2;
+  //FORCE_LA_CHECK=true;
+}
+PARSER_BEGIN(ShellParser)
+package de.up.ling.shell;
+
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.*;
+import java.io.*;
+
+//import de.saar.chorus.term.*;
+//import de.saar.basic.tree.*;
+
+/**
+ * Parser for interpreted bottom-up automata
+ * @author Alexander Koller
+ */
+public class ShellParser {
+    private static ShellParser parser = new ShellParser(new ByteArrayInputStream(new byte[]{}));
+
+    public static Expression parse(Reader reader) throws ParseException {
+        parser = new ShellParser(new ByteArrayInputStream(new byte[]{}));
+        parser.ReInit(reader);
+
+	return parser.fullExpression();
+    }
+}
+PARSER_END(ShellParser)
+
+SKIP : { " " | "\t" | "\r" | "\n" }
+
+TOKEN :
+{
+    < NAME:     ["a"-"z","A"-"Z","_"] (["a"-"z","A"-"Z","_", "'", "<", ">", "+", "-", "0"-"9", "*"] )* > |
+    < QUOTEDSTRING:     ["\""] (["a"-"z","A"-"Z","_", "'", "<", ">", "+", "-", "0"-"9", "*", "/", ".", "~", " "] )* ["\""]> |
+    <LINE_END_COMMENT: "//" (~["\n"])* >
+}
+
+// enforce that complete input gets consumed
+Expression fullExpression() : {
+    Expression e;
+}{
+    e=expression() <EOF> { return e; }
+}
+
+
+Expression expression()  : {
+    Expression sub;
+}{
+    (LOOKAHEAD(2)  sub=assign() | sub=call() | sub=var() | sub=reader())
+    (<LINE_END_COMMENT>)? {
+        return sub;
+    } |
+    (<LINE_END_COMMENT>)? {
+        return new Expression(Expression.Type.NOP);
+    }
+}
+
+Expression assign()  : {
+    Expression sub;
+    String name;
+}{
+    (name = <NAME>.image) "=" (sub = expression()) {
+        return new Expression(Expression.Type.ASSIGN, name, sub);
+    }
+}
+
+Expression var() : {
+    String name;
+}{
+    name=<NAME>.image { return new Expression(Expression.Type.VARIABLE, name); }
+}
+
+Expression reader()  : {
+    String name;
+}{
+    "[" name=quotedString() "]" { return new Expression(Expression.Type.READER, new File(name)); }
+    | name=quotedString() { return new Expression(Expression.Type.READER, name); }
+}
+
+Expression call()  : {
+    Expression functor = Expression.MAIN;
+    String method;
+    List<Expression> args;
+}{
+    LOOKAHEAD(2)
+        functor=var() "." method=<NAME>.image "(" args=arglist() ")" {
+            return new Expression(Expression.Type.CALL, functor, method, args);
+        }
+        | method=<NAME>.image "(" args=arglist() ")" {
+            return new Expression(Expression.Type.CALL, functor, method, args);
+        }
+}
+
+List<Expression> arglist()  : {
+    List<Expression> arguments = new ArrayList<Expression>();
+    Map<String,Expression> map = new HashMap<String,Expression>();
+    
+}{
+    (arg(arguments, map) ("," arg(arguments, map))*)
+    {
+        if( ! map.isEmpty() ) {
+            arguments.add(new Expression(Expression.Type.MAP, map));
+        }
+        return arguments;
+    }
+}
+
+void arg(List<Expression> arguments, Map<String,Expression> map)  : {
+    String name;
+    Expression expr;
+}{
+   LOOKAHEAD(2)
+    name = <NAME>.image ":" expr = expression() { map.put(name, expr); }
+    | expr = expression() { if( expr.type != Expression.Type.NOP ) arguments.add(expr); }
+}
+
+
+
+String quotedString() : {
+    String x;
+}{
+    x=<QUOTEDSTRING>.image { return x.substring(1, x.length()-1); }
+}
