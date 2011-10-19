@@ -79,5 +79,20 @@ class TreeTest {
 
         assert term.equals(decoded);
     }
+
+    @Test
+    public void testAddSubtree(){
+        Term term1 = TermParser.parse("f(g(a),b)");
+        Term term2 = TermParser.parse("p(c)");
+        Tree<Term> tree1 = term1.toTree();
+        Tree<Term> tree2 = term2.toTree();
+        String root = tree1.getRoot();
+        tree1.addSubTree(tree2,root);
+
+        Term finl = TermParser.parse("f(g(a),b,p(c))");
+        Tree<Term> treef = finl.toTree();
+
+        assert tree1.equals(treef);
+    }
 }
 

@@ -83,6 +83,34 @@ public class Tree<E>  {
         return addNode(null, label, parent);
     }
 
+    // Adds a tree of the same type to the current Tree
+    public void addSubTree(Tree<E> sub, String parent){
+
+        HashMap<String,String> oldVsNew = new HashMap<String,String>();
+
+        // generates new node names to fit in the current tree
+        for (String key : sub.nodeLabels.keySet()){
+            String temp = gensym();
+            nodeLabels.put(temp,sub.nodeLabels.get(key));
+            oldVsNew.put(key,temp);
+        }
+        
+        // updates children and parent lists
+        for (String key : sub.parents.keySet()){
+            parents.put(oldVsNew.get(key),sub.parents.get(key));
+        }
+        parents.put(oldVsNew.get(sub.getRoot()), parent);
+        
+        children.get(parent).add(oldVsNew.get(sub.getRoot()));
+        for (String key : sub.children.keySet()){
+             ArrayList<String> newChildren = new ArrayList<String>();
+            for (String child : sub.children.get(key)){
+                newChildren.add(oldVsNew.get(child));
+            }
+            children.put(oldVsNew.get(key),newChildren);
+        }
+     }
+
     public E getLabel(String node) {
         return nodeLabels.get(node);
     }
