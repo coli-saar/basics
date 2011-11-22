@@ -94,5 +94,22 @@ class TreeTest {
 
         assert tree1.equals(treef);
     }
+
+    @Test
+    public void testReplaceNode(){
+        Term finl = TermParser.parse("f(g(a),b,p(c))");
+        Tree<Term> treef = finl.toTree();
+        Term newT = TermParser.parse("x");
+        Tree<Term> newTf = newT.toTree();
+
+        String node = treef.getNodeAtAddress("2");
+        treef.replaceNode(node,newTf);
+
+        Term t1 = TermParser.parse("f(g(a),b,x)");
+        Tree<Term> tree1 = t1.toTree();
+
+        assert tree1.equals(treef);
+
+    }
 }
 

@@ -111,6 +111,23 @@ public class Tree<E>  {
         }
      }
 
+    /**
+	replaces any given node in the tree wit the given subtree
+	subtree starting at the node which is to be replaced will be omitted
+        TODO - Change parent list too.
+   */
+   public void replaceNode(String node, Tree<E> newSubtree){
+	// delete all children of node
+        String parent = this.getParent(node);
+        List<String> removedNode = children.get(parent);
+        removedNode.remove(node);
+        children.remove(parent);
+        children.put(parent,removedNode);
+	// add newSubTree
+        this.addSubTree(newSubtree,parent);
+
+    }
+
     public E getLabel(String node) {
         return nodeLabels.get(node);
     }
@@ -275,7 +292,7 @@ public class Tree<E>  {
 
     private boolean equals(String node, String nodeOther, Tree<E> treeOther) {
         if (!getLabel(node).equals(treeOther.getLabel(nodeOther))) {
-            System.err.println("mismatch at " + node + "/" + nodeOther +": '" + getLabel(node) + "'(" + getLabel(node).getClass() + ") - '" + treeOther.getLabel(nodeOther) + "' (" + treeOther.getLabel(nodeOther).getClass());
+  //          System.err.println("mismatch at " + node + "/" + nodeOther +": '" + getLabel(node) + "'(" + getLabel(node).getClass() + ") - '" + treeOther.getLabel(nodeOther) + "' (" + treeOther.getLabel(nodeOther).getClass());
             return false;
         }
 
