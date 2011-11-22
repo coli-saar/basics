@@ -83,6 +83,31 @@ public class Tree<E>  {
         return addNode(null, label, parent);
     }
 
+    /**
+     * Adds a subtree of the same type to a specific position among
+     * the children nodes of the parent
+     * @param sub
+     * @param parent
+     * @param position
+     */
+    public void addSubTree(Tree<E> sub, String parent, int position){
+        this.addSubTree(sub, parent);
+        List<String> oldChildren = children.get(parent);
+
+        // String pos = oldChildren.get(position);
+        String newT = oldChildren.get(oldChildren.size() - 1);
+
+        // delete last element
+        oldChildren.remove(oldChildren.size() - 1);
+
+        // put on new position
+        oldChildren.add(position, newT);
+        //oldChildren.add(oldChildren.size() - 1,pos);
+        children.remove(parent);
+        children.put(parent,oldChildren);
+
+    }
+
     // Adds a tree of the same type to the current Tree
     public void addSubTree(Tree<E> sub, String parent){
 
@@ -120,11 +145,12 @@ public class Tree<E>  {
 	// delete all children of node
         String parent = this.getParent(node);
         List<String> removedNode = children.get(parent);
+        int index = removedNode.indexOf(node);
         removedNode.remove(node);
         children.remove(parent);
         children.put(parent,removedNode);
 	// add newSubTree
-        this.addSubTree(newSubtree,parent);
+        this.addSubTree(newSubtree,parent,index);
 
     }
 
