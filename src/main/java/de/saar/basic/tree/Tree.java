@@ -24,6 +24,14 @@ public class Tree<E>  {
         root = null;
     }
 
+    public Map<String, List<String>> getChild(){
+        return this.children;
+    }
+
+    public Map<String, String> getPar(){
+        return this.parents;
+    }
+
     public Tree<E> copy() {
         Tree<E> ret = new Tree<E>();
         
@@ -119,10 +127,10 @@ public class Tree<E>  {
             nodeLabels.put(temp,sub.nodeLabels.get(key));
             oldVsNew.put(key,temp);
         }
-        
+      
         // updates children and parent lists
         for (String key : sub.parents.keySet()){
-            parents.put(oldVsNew.get(key),sub.parents.get(key));
+            parents.put(oldVsNew.get(key),oldVsNew.get(sub.parents.get(key)));
         }
         parents.put(oldVsNew.get(sub.getRoot()), parent);
         
@@ -143,6 +151,14 @@ public class Tree<E>  {
    */
    public void replaceNode(String node, Tree<E> newSubtree){
 	// delete all children of node
+        if(node.equals(this.getRoot())){
+            this.root = newSubtree.getRoot();
+            this.children = newSubtree.children;
+            this.parents = newSubtree.parents;
+            this.nodeLabels = newSubtree.nodeLabels;
+            this.gensymNext = newSubtree.gensymNext;
+        }
+        else{
         String parent = this.getParent(node);
         List<String> removedNode = children.get(parent);
         int index = removedNode.indexOf(node);
@@ -151,7 +167,7 @@ public class Tree<E>  {
         children.put(parent,removedNode);
 	// add newSubTree
         this.addSubTree(newSubtree,parent,index);
-
+       }
     }
 
     public E getLabel(String node) {
@@ -247,7 +263,7 @@ public class Tree<E>  {
         }
     }
 
-    private void printAsString(String node, boolean printNodeNames, StringBuffer buf) {
+    public void printAsString(String node, boolean printNodeNames, StringBuffer buf) {
         boolean first = true;
         buf.append(getNodeDescription(node, printNodeNames));
 
