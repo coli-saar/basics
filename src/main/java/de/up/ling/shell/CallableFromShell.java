@@ -10,7 +10,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * Annotate a method with this annotation class to make it available from
+ * the shell.
+ * 
  * @author koller
  */
 @Retention(RetentionPolicy.RUNTIME)

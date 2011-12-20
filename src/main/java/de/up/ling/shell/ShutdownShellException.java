@@ -5,7 +5,9 @@
 package de.up.ling.shell;
 
 /**
- *
+ * Exception that a @CallableFromShell method can throw to signal to the
+ * shell that it should shut down.
+ * 
  * @author koller
  */
 public class ShutdownShellException extends Exception {
