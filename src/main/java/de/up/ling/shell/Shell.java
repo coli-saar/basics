@@ -63,7 +63,7 @@ public class Shell {
                         println("Syntax error: " + ex.getMessage());
                     } catch (ShutdownShellException ex) {
                         throw ex;
-                    } catch (Exception ex) {
+                    } catch (Throwable ex) {
                         reportException(ex);
                     }
                 }
@@ -210,7 +210,7 @@ public class Shell {
         return m.getAnnotation(CallableFromShell.class);
     }
 
-    private void reportException(Exception ex) {
+    private void reportException(Throwable ex) {
         println("An error occurred: " + ex.getClass() + "\n" + ex.getMessage());
         ex.printStackTrace(exceptionWriter);
         exceptionWriter.flush();
