@@ -11,8 +11,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,39 +32,87 @@ public class Shell {
     private Map<String, Object> variables = new HashMap<String, Object>();
     private boolean quiet = false;
     private Object main;
+    private PrintWriter exceptionWriter = null;
 
     public void run(Object main) throws IOException {
-        this.main = main;
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 
-        while (true) {
-            if (!quiet) {
-                System.out.print("> ");
-            }
-            String line = console.readLine();
+        this.main = main;
+        exceptionWriter = new PrintWriter(new OutputStreamWriter(System.out));
 
-            if (line == null) {
-                System.exit(0);
-            } else {
-                try {
-                    Expression expr = ShellParser.parse(new StringReader(line));
-                    Object val = evaluate(expr);
-
-                    if (!quiet) {
-                        if (val != null) {
-                            System.out.println(val);
-                        }
-                    }
-                } catch (ParseException ex) {
-                    System.out.println("Syntax error: " + ex.getMessage());
-                } catch (Exception ex) {
-                    reportException(ex);
+        try {
+            while (true) {
+                if (!quiet) {
+                    System.out.print("> ");
                 }
+                String line = console.readLine();
+
+                if (line == null) {
+                    System.exit(0);
+                } else {
+                    try {
+                        Expression expr = ShellParser.parse(new StringReader(line));
+                        Object val = evaluate(expr);
+
+                        if (!quiet) {
+                            if (val != null) {
+                                System.out.println(val);
+                            }
+                        }
+                    } catch (ParseException ex) {
+                        println("Syntax error: " + ex.getMessage());
+                    } catch (ShutdownShellException ex) {
+                        throw ex;
+                    } catch (Exception ex) {
+                        reportException(ex);
+                    }
+                }
+            }
+        } catch (ShutdownShellException e) {
+        }
+    }
+
+    public void startServer(Object main, int port) throws IOException {
+        ServerSocket ssock = new ServerSocket(port);
+
+        this.main = main;
+
+        while (true) {
+            Socket socket = ssock.accept();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+            String line = null;
+
+            exceptionWriter = writer;
+
+            try {
+                while ((line = reader.readLine()) != null) {
+                    try {
+                        Expression expr = ShellParser.parse(new StringReader(line));
+                        Object val = evaluate(expr);
+                        writer.println(val);
+                        writer.flush();
+                    } catch (ParseException ex) {
+                        writer.println("*** syntax error: " + ex.getMessage());
+                        writer.flush();
+                    } catch (ShutdownShellException ex) {
+                        throw ex;
+                    } catch (IOException ex) {
+                        throw ex;
+                    } catch (Throwable ex) {
+                        writer.println("*** exception: " + ex.toString());
+                        writer.flush();
+                    }
+                }
+            } catch (IOException ex) {
+                socket.close();
+            } catch (ShutdownShellException ex) {
+                socket.close();
             }
         }
     }
 
-    private Object evaluate(Expression expr) throws ParseException, FileNotFoundException, IOException {
+    private Object evaluate(Expression expr) throws ParseException, FileNotFoundException, IOException, ShutdownShellException {
         switch (expr.type) {
             case VARIABLE:
                 return variables.get(expr.getString(0));
@@ -74,7 +127,7 @@ public class Shell {
                 } else if (expr.getArgument(0) instanceof File) {
                     return new FileReader((File) expr.getArgument(0));
                 } else {
-                    System.err.println("Error: Reader with content type " + expr.getArgument(0).getClass());
+                    println("*** Error: Reader with content type " + expr.getArgument(0).getClass());
                     return null;
                 }
             case CALL:
@@ -113,20 +166,24 @@ public class Shell {
                     }
 
                     if (method == null) {
-                        System.out.println("Class " + functor.getClass() + " has no method " + methodName + "(" + StringTools.join(argClasses, ",") + ").");
+                        println("*** Class " + functor.getClass() + " has no method " + methodName + "(" + StringTools.join(argClasses, ",") + ").");
                         return null;
                     } else {
                         Object result = method.invoke(functor, argArray);
-                        
-                        if( (result instanceof Collection) && ! ann(method).joinList().equals(CallableFromShell.DO_NOT_JOIN) ) {
+
+                        if ((result instanceof Collection) && !ann(method).joinList().equals(CallableFromShell.DO_NOT_JOIN)) {
                             result = StringTools.join((Collection) result, ann(method).joinList());
                         }
-                        
+
                         return result;
                     }
                 } catch (Exception ex) {
-                    reportException(ex);
-                    return null;
+                    if (ex instanceof InvocationTargetException && ((InvocationTargetException) ex).getTargetException() instanceof ShutdownShellException) {
+                        throw (ShutdownShellException) ((InvocationTargetException) ex).getTargetException();
+                    } else {
+                        reportException(ex);
+                        return null;
+                    }
                 }
 
             case MAP:
@@ -144,13 +201,19 @@ public class Shell {
         }
     }
     
+    private void println(Object x) {
+        exceptionWriter.println(x);
+        exceptionWriter.flush();
+    }
+
     private static CallableFromShell ann(Method m) {
         return m.getAnnotation(CallableFromShell.class);
     }
 
-    private static void reportException(Exception ex) {
-        System.out.println("An error occurred: " + ex.getClass() + "\n" + ex.getMessage());
-        ex.printStackTrace();
+    private void reportException(Exception ex) {
+        println("An error occurred: " + ex.getClass() + "\n" + ex.getMessage());
+        ex.printStackTrace(exceptionWriter);
+        exceptionWriter.flush();
     }
 
     private static String getMethodName(Method m) {
@@ -163,7 +226,7 @@ public class Shell {
         }
     }
 
-    private List evaluateList(List<Object> list) throws ParseException, FileNotFoundException, IOException {
+    private List evaluateList(List<Object> list) throws ParseException, FileNotFoundException, IOException, ShutdownShellException {
         List ret = new ArrayList();
 
         for (Object o : list) {
@@ -177,21 +240,4 @@ public class Shell {
         return ret;
     }
 
-    /////////////////////////////////////////
-    @CallableFromShell
-    public void quit() {
-        System.exit(0);
-    }
-
-    @CallableFromShell
-    public void println(Object val) {
-        if (val != null) {
-            System.out.println(val);
-        }
-    }
-
-    public static void main(String args[]) throws IOException {
-        Shell shell = new Shell();
-        shell.run(shell);
-    }
 }
