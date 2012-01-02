@@ -33,6 +33,8 @@ public class Shell {
     private boolean quiet = false;
     private Object main;
     private PrintWriter exceptionWriter = null;
+    private String outputEndMarker = null;
+    private boolean verbose = false;
 
     public void run(Object main) throws IOException {
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
@@ -71,6 +73,20 @@ public class Shell {
         } catch (ShutdownShellException e) {
         }
     }
+    
+    public void setOutputEndMarker(String marker) {
+        outputEndMarker = marker;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+    
+    private void printMarker(PrintWriter writer) {
+        if( outputEndMarker != null ) {
+            writer.println(outputEndMarker);
+        }
+    }
 
     public void startServer(Object main, int port) throws IOException {
         ServerSocket ssock = new ServerSocket(port);
@@ -87,10 +103,15 @@ public class Shell {
 
             try {
                 while ((line = reader.readLine()) != null) {
+                    if( verbose ) {
+                        System.err.println(" -> " + line);
+                    }
+                    
                     try {
                         Expression expr = ShellParser.parse(new StringReader(line));
                         Object val = evaluate(expr);
                         writer.println(val);
+                        printMarker(writer);                        
                         writer.flush();
                     } catch (ParseException ex) {
                         writer.println("*** syntax error: " + ex.getMessage());
