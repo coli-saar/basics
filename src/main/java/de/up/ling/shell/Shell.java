@@ -34,6 +34,7 @@ public class Shell {
     private Object main;
     private PrintWriter exceptionWriter = null;
     private String outputEndMarker = null;
+    private String errorMarker = "";
     private boolean verbose = false;
 
     public void run(Object main) throws IOException {
@@ -78,6 +79,12 @@ public class Shell {
         outputEndMarker = marker;
     }
 
+    public void setErrorMarker(String errorMarker) {
+        this.errorMarker = errorMarker;
+    }
+    
+    
+
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
@@ -114,14 +121,14 @@ public class Shell {
                         printMarker(writer);                        
                         writer.flush();
                     } catch (ParseException ex) {
-                        writer.println("*** syntax error: " + ex.getMessage());
+                        writer.println(errorMarker + "syntax error: " + ex.getMessage());
                         writer.flush();
                     } catch (ShutdownShellException ex) {
                         throw ex;
                     } catch (IOException ex) {
                         throw ex;
                     } catch (Throwable ex) {
-                        writer.println("*** exception: " + ex.toString());
+                        writer.println(errorMarker + "exception: " + ex.toString());
                         writer.flush();
                     }
                 }
@@ -148,7 +155,7 @@ public class Shell {
                 } else if (expr.getArgument(0) instanceof File) {
                     return new FileReader((File) expr.getArgument(0));
                 } else {
-                    println("*** Error: Reader with content type " + expr.getArgument(0).getClass());
+                    println(errorMarker + "Reader with content type " + expr.getArgument(0).getClass());
                     return null;
                 }
             case CALL:
@@ -187,7 +194,7 @@ public class Shell {
                     }
 
                     if (method == null) {
-                        println("*** Class " + functor.getClass() + " has no method " + methodName + "(" + StringTools.join(argClasses, ",") + ").");
+                        println(errorMarker + "Class " + functor.getClass() + " has no method " + methodName + "(" + StringTools.join(argClasses, ",") + ").");
                         return null;
                     } else {
                         Object result = method.invoke(functor, argArray);
@@ -232,7 +239,7 @@ public class Shell {
     }
 
     private void reportException(Throwable ex) {
-        println("An error occurred: " + ex.getClass() + "\n" + ex.getMessage());
+        println(errorMarker + "An error occurred: " + ex.getClass() + "\n" + ex.getMessage());
         ex.printStackTrace(exceptionWriter);
         exceptionWriter.flush();
     }
