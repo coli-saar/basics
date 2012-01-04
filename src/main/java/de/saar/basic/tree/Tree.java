@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Tree<E>  {
+public class Tree<E> {
     private Map<String, List<String>> children;
     private Map<String, String> parents;
     private Map<String, E> nodeLabels;
@@ -24,29 +24,27 @@ public class Tree<E>  {
         root = null;
     }
 
-    public Map<String, List<String>> getChild(){
+    public Map<String, List<String>> getChild() {
         return this.children;
     }
 
-    public Map<String, String> getPar(){
+    public Map<String, String> getPar() {
         return this.parents;
     }
 
     public Tree<E> copy() {
         Tree<E> ret = new Tree<E>();
-        
-        for( String k : children.keySet() ) {
+
+        for (String k : children.keySet()) {
             ret.children.put(k, new ArrayList<String>(children.get(k)));
         }
         ret.parents.putAll(parents);
         ret.nodeLabels.putAll(nodeLabels);
         ret.root = root;
         ret.gensymNext = gensymNext;
-        
+
         return ret;
     }
-    
-    
 
     public Tree<E> subtree(String node) {
         Tree<E> ret = new Tree<E>();
@@ -90,6 +88,17 @@ public class Tree<E>  {
     public String addNode(E label, String parent) {
         return addNode(null, label, parent);
     }
+    
+    public void removeNode(String node) {
+        if( node.equals(root)) {
+            children.clear();
+            parents.clear();
+            root = null;
+        } else {
+            children.get(getParent(node)).remove(node);
+            parents.remove(node);
+        }
+    }
 
     /**
      * Adds a subtree of the same type to a specific position among
@@ -98,7 +107,7 @@ public class Tree<E>  {
      * @param parent
      * @param position
      */
-    public void addSubTree(Tree<E> sub, String parent, int position){
+    public void addSubTree(Tree<E> sub, String parent, int position) {
         this.addSubTree(sub, parent);
         List<String> oldChildren = children.get(parent);
 
@@ -112,62 +121,61 @@ public class Tree<E>  {
         oldChildren.add(position, newT);
         //oldChildren.add(oldChildren.size() - 1,pos);
         children.remove(parent);
-        children.put(parent,oldChildren);
+        children.put(parent, oldChildren);
 
     }
 
     // Adds a tree of the same type to the current Tree
-    public void addSubTree(Tree<E> sub, String parent){
+    public void addSubTree(Tree<E> sub, String parent) {
 
-        HashMap<String,String> oldVsNew = new HashMap<String,String>();
+        HashMap<String, String> oldVsNew = new HashMap<String, String>();
 
         // generates new node names to fit in the current tree
-        for (String key : sub.nodeLabels.keySet()){
+        for (String key : sub.nodeLabels.keySet()) {
             String temp = gensym();
-            nodeLabels.put(temp,sub.nodeLabels.get(key));
-            oldVsNew.put(key,temp);
+            nodeLabels.put(temp, sub.nodeLabels.get(key));
+            oldVsNew.put(key, temp);
         }
-      
+
         // updates children and parent lists
-        for (String key : sub.parents.keySet()){
-            parents.put(oldVsNew.get(key),oldVsNew.get(sub.parents.get(key)));
+        for (String key : sub.parents.keySet()) {
+            parents.put(oldVsNew.get(key), oldVsNew.get(sub.parents.get(key)));
         }
         parents.put(oldVsNew.get(sub.getRoot()), parent);
-        
+
         children.get(parent).add(oldVsNew.get(sub.getRoot()));
-        for (String key : sub.children.keySet()){
-             ArrayList<String> newChildren = new ArrayList<String>();
-            for (String child : sub.children.get(key)){
+        for (String key : sub.children.keySet()) {
+            ArrayList<String> newChildren = new ArrayList<String>();
+            for (String child : sub.children.get(key)) {
                 newChildren.add(oldVsNew.get(child));
             }
-            children.put(oldVsNew.get(key),newChildren);
+            children.put(oldVsNew.get(key), newChildren);
         }
-     }
+    }
 
     /**
-	replaces any given node in the tree wit the given subtree
-	subtree starting at the node which is to be replaced will be omitted
-        TODO - Change parent list too.
-   */
-   public void replaceNode(String node, Tree<E> newSubtree){
-	// delete all children of node
-        if(node.equals(this.getRoot())){
+    replaces any given node in the tree wit the given subtree
+    subtree starting at the node which is to be replaced will be omitted
+    TODO - Change parent list too.
+     */
+    public void replaceNode(String node, Tree<E> newSubtree) {
+        // delete all children of node
+        if (node.equals(this.getRoot())) {
             this.root = newSubtree.getRoot();
             this.children = newSubtree.children;
             this.parents = newSubtree.parents;
             this.nodeLabels = newSubtree.nodeLabels;
             this.gensymNext = newSubtree.gensymNext;
+        } else {
+            String parent = this.getParent(node);
+            List<String> removedNode = children.get(parent);
+            int index = removedNode.indexOf(node);
+            removedNode.remove(node);
+            children.remove(parent);
+            children.put(parent, removedNode);
+            // add newSubTree
+            this.addSubTree(newSubtree, parent, index);
         }
-        else{
-        String parent = this.getParent(node);
-        List<String> removedNode = children.get(parent);
-        int index = removedNode.indexOf(node);
-        removedNode.remove(node);
-        children.remove(parent);
-        children.put(parent,removedNode);
-	// add newSubTree
-        this.addSubTree(newSubtree,parent,index);
-       }
     }
 
     public E getLabel(String node) {
@@ -334,7 +342,7 @@ public class Tree<E>  {
 
     private boolean equals(String node, String nodeOther, Tree<E> treeOther) {
         if (!getLabel(node).equals(treeOther.getLabel(nodeOther))) {
-  //          System.err.println("mismatch at " + node + "/" + nodeOther +": '" + getLabel(node) + "'(" + getLabel(node).getClass() + ") - '" + treeOther.getLabel(nodeOther) + "' (" + treeOther.getLabel(nodeOther).getClass());
+            //          System.err.println("mismatch at " + node + "/" + nodeOther +": '" + getLabel(node) + "'(" + getLabel(node).getClass() + ") - '" + treeOther.getLabel(nodeOther) + "' (" + treeOther.getLabel(nodeOther).getClass());
             return false;
         }
 
