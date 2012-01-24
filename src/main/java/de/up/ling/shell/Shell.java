@@ -36,6 +36,7 @@ public class Shell {
     private String outputEndMarker = null;
     private String errorMarker = "";
     private boolean verbose = false;
+    private boolean measureExecutionTime = false;
 
     public void run(Object main) throws IOException {
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
@@ -55,7 +56,13 @@ public class Shell {
                 } else {
                     try {
                         Expression expr = ShellParser.parse(new StringReader(line));
+                        long startTime = System.currentTimeMillis();
                         Object val = evaluate(expr);
+                        long endTime = System.currentTimeMillis();
+                        
+                        if( measureExecutionTime ) {
+                            System.err.println("[execution time: " + (endTime-startTime) + "ms]");
+                        }
 
                         if (!quiet) {
                             if (val != null) {
@@ -74,6 +81,12 @@ public class Shell {
         } catch (ShutdownShellException e) {
         }
     }
+
+    public void setMeasureExecutionTime(boolean measureExecutionTime) {
+        this.measureExecutionTime = measureExecutionTime;
+    }
+    
+    
     
     public void setOutputEndMarker(String marker) {
         outputEndMarker = marker;
