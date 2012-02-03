@@ -5,11 +5,13 @@
 
 package de.saar.basic;
 
+import java.io.Serializable;
+
 /**
  *
  * @author koller
  */
-public class Pair<E,F> {
+public class Pair<E,F> implements Serializable {
     public E left;
     public F right;
 
