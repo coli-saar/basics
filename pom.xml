@@ -85,10 +85,10 @@
         <repository>
             <id>ecl-repository</id>
             <name>Coli ECL Maven repository</name>
-	    <url>scpexe://httpd.coli.uni-saarland.de/web/www.coli.uni-saarland.de/html/projects/ecl/maven2/releases</url>
+	    <url>scpexe://tcl@bramaputra.ling.uni-potsdam.de//home/tcl/tcl-web/maven2/releases</url>
         </repository>
 
-        <downloadUrl>http://www.coli.uni-saarland.de/projects/ecl/maven2/releases</downloadUrl>
+        <downloadUrl>http://www.ling.uni-potsdam.de/tcl/maven2/releases</downloadUrl>
     </distributionManagement>
 
     <repositories>
@@ -100,6 +100,6 @@
 
 
   <scm>
-    <developerConnection>scm:svn:http://www.ling.uni-potsdam.de/svn/penguin/trunk/Code/basics</developerConnection>
+    <developerConnection>scm:svn:http://svn.ling.uni-potsdam.de/penguin/trunk/Code/basics</developerConnection>
   </scm>
 </project>
