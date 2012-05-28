@@ -68,8 +68,16 @@ class TreeTest {
     public void testTermToTree() {
         Term term = TermParser.parse("f(g(a),b)");
         Tree<String> tree = term.toTree();
-        assert tree.toString().equals("f(g(a) b)") : tree.toString();
+        assert tree.toString().equals("f(g(a), b)") : tree.toString();
     }
+
+    @Test
+    public void testUnparseParse() {
+        Term term = TermParser.parse("f(g(a),b)");
+        Tree<String> tree = term.toTree();
+        Term t2 = TermParser.parse(tree.toString());
+        assert term.equals(t2) : t2;
+   }
 
     @Test
     public void testTreeToTerm() {

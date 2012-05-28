@@ -281,7 +281,7 @@ public class Tree<E> {
                 if (first) {
                     first = false;
                 } else {
-                    buf.append(" ");
+                    buf.append(", ");
                 }
                 printAsString(child, printNodeNames, buf);
             }
