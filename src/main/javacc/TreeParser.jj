@@ -1,0 +1,57 @@
+options {
+	LOOKAHEAD = 2;
+	STATIC = false;
+    JDK_VERSION = "1.5";
+}
+
+
+
+PARSER_BEGIN(TreeParser)
+package de.up.ling.tree;
+
+import java.util.*;
+import java.io.*;
+
+public class TreeParser {
+	
+    public static Tree<String> parse(String string) {
+        try {
+            TreeParser p = new TreeParser(new StringReader(string));
+            return p.tree();
+        } catch(ParseException e) {
+            System.err.println("Exception while parsing " + string + ": " + e);
+            return null;
+        }
+    }
+}
+PARSER_END(TreeParser)
+
+
+
+
+SKIP : { " " | "\r" | "\t" | "\n" }
+
+TOKEN : {
+   <ATOM : ["a"-"z", "A"-"Z", "*", "+", "_"] (["a"-"z", "A"-"Z", "_", "0"-"9", "-", "*", "+", "_"])*>
+}
+
+
+
+Tree<String> tree() :
+{
+	Token label;
+	List<Tree<String>> subterms = new ArrayList<Tree<String>>();
+	Tree subtree;
+}
+{
+	label = <ATOM> "(" 
+               (subtree = tree() { subterms.add(subtree); })
+               ("," subtree = tree() { subterms.add(subtree); })*
+        	 ")" {
+		return Tree.create(label.image, subterms);
+	}
+	
+        | label = <ATOM> {
+	    return Tree.create(label.image, new Tree[0]);
+         }
+}
