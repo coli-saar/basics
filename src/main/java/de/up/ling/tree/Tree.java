@@ -15,7 +15,7 @@ import java.util.List;
 public class Tree<E> implements Cloneable {
     private E label;
     private List<Tree<E>> children;
-    private static final List EMPTY_CHILDREN_LIST = new ArrayList();
+    private boolean allowCaching = true;
 
     private Tree() {
     }
@@ -43,13 +43,20 @@ public class Tree<E> implements Cloneable {
      * Returns a tree with a single node with the given label.
      */
     public static <E> Tree<E> create(E label) {
-        return create(label, (List<Tree<E>>) EMPTY_CHILDREN_LIST);
+        return create(label, new ArrayList<Tree<E>>());
     }
 
     public E getLabel() {
         return label;
     }
 
+    /**
+     * Returns the list of children (= subtrees) of this tree.
+     * It is _strongly_ recommended that you do not modify the contents
+     * of this list, as this may break things.
+     * 
+     * @return 
+     */
     public List<Tree<E>> getChildren() {
         return children;
     }
@@ -177,7 +184,7 @@ public class Tree<E> implements Cloneable {
 
     @Override
     public String toString() {
-        if (cachedToString == null) {
+        if (!allowCaching || cachedToString == null) {
             StringBuilder buf = new StringBuilder();
 
             printAsString(buf);
@@ -230,7 +237,7 @@ public class Tree<E> implements Cloneable {
 
     @Override
     public int hashCode() {
-        if (cachedHashCode == 0) {
+        if (!allowCaching || cachedHashCode == 0) {
             cachedHashCode = 5;
             cachedHashCode = 71 * cachedHashCode + (this.label != null ? this.label.hashCode() : 0);
             cachedHashCode = 71 * cachedHashCode + (this.children != null ? this.children.hashCode() : 0);
@@ -256,5 +263,30 @@ public class Tree<E> implements Cloneable {
     public void invalidateCache() {
         cachedHashCode = 0;
         cachedToString = null;
+    }
+
+    /**
+     * Changes the label of this node. You should only use this method
+     * if you know what you're doing, as it may change the internal state
+     * of the Tree object in unpredictable ways.
+     * 
+     * @param label 
+     */
+    public void setLabel(E label) {
+        this.label = label;
+        invalidateCache();
+    }
+    
+    /**
+     * Sets the caching policy for this tree. The default is that
+     * the hashcode and toString for the tree are only computed once.
+     * This is appropriate as long as the trees are used as immutable objects,
+     * which they usually should. If the trees are modified, this method
+     * can be used to switch off caching.
+     * 
+     * @param allowCaching 
+     */
+    public void setCachingPolicy(boolean allowCaching) {
+        this.allowCaching = allowCaching;
     }
 }
