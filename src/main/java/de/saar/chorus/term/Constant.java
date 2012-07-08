@@ -78,4 +78,9 @@ public class Constant extends Term {
     protected void buildTerm(Tree<String> tree, String parent) {
         tree.addNode(name, parent);
     }
+
+    @Override
+    public de.up.ling.tree.Tree<StringOrVariable> toTreeWithVariables() {
+        return de.up.ling.tree.Tree.create(new StringOrVariable(name, false));
+    }
 }

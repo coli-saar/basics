@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.saar.basic.StringTools;
+import java.util.ArrayList;
 
 public class Compound extends Term {
     private final String label;
@@ -203,5 +204,16 @@ public class Compound extends Term {
         for( Term child : getSubterms() ) {
             child.buildTerm(tree, nodeHere);
         }
+    }
+
+    @Override
+    public de.up.ling.tree.Tree<StringOrVariable> toTreeWithVariables() {
+        List<de.up.ling.tree.Tree<StringOrVariable>> children = new ArrayList<de.up.ling.tree.Tree<StringOrVariable>>();
+        
+        for( Term sub : subterms ) {
+            children.add(sub.toTreeWithVariables());
+        }
+        
+        return de.up.ling.tree.Tree.create(new StringOrVariable(label, false), children);
     }
 }

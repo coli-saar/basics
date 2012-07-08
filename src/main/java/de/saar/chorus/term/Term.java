@@ -7,7 +7,6 @@
 package de.saar.chorus.term;
 
 import de.saar.basic.StringOrVariable;
-import de.saar.basic.tree.Tree;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -77,17 +76,19 @@ public abstract class Term implements Serializable {
     public abstract String toLispString();
     
     
-    public Tree<StringOrVariable> toTreeWithVariables() {
-        Tree<StringOrVariable> ret = new Tree<StringOrVariable>();
+    public de.saar.basic.tree.Tree<StringOrVariable> toOldTreeWithVariables() {
+        de.saar.basic.tree.Tree<StringOrVariable> ret = new de.saar.basic.tree.Tree<StringOrVariable>();
         buildTermWithVariables(ret, null);
         return ret;
     }    
+
+    public abstract de.up.ling.tree.Tree<StringOrVariable> toTreeWithVariables();
     
-    protected abstract void buildTermWithVariables(Tree<StringOrVariable> tree, String parent);
-    protected abstract void buildTerm(Tree<String> tree, String parent);
+    protected abstract void buildTermWithVariables(de.saar.basic.tree.Tree<StringOrVariable> tree, String parent);
+    protected abstract void buildTerm(de.saar.basic.tree.Tree<String> tree, String parent);
     
-    public Tree<String> toTree() {
-        Tree<String> ret = new Tree<String>();
+    public de.saar.basic.tree.Tree<String> toTree() {
+        de.saar.basic.tree.Tree<String> ret = new de.saar.basic.tree.Tree<String>();
         buildTerm(ret, null);
         return ret;
     }
