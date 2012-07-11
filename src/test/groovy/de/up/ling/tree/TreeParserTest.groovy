@@ -33,6 +33,20 @@ class TreeParserTest {
         assertEquals(gold, t)
     }
     
+    @Test
+    public void testParseQuotes() {
+        Tree t = p("'  f  '('?_*')")
+        Tree gold = c("  f  ", [c("?_*", [])])
+        assertEquals(gold, t)
+    }
+    
+    @Test
+    public void testQuotesParseToString() {
+        Tree t = p("'  f  '('?_*')")
+        Tree t2 = p(t.toString())
+        assertEquals(t,t2)
+    }
+    
     public static Tree c(Object label, List children) {
         return Tree.create(label, children);
     }

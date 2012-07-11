@@ -32,26 +32,36 @@ PARSER_END(TreeParser)
 SKIP : { " " | "\r" | "\t" | "\n" }
 
 TOKEN : {
-   <ATOM : ["a"-"z", "A"-"Z", "*", "+", "_"] (["a"-"z", "A"-"Z", "_", "0"-"9", "-", "*", "+", "_"])*>
+   <ATOM : ["a"-"z", "A"-"Z", "*", "+", "_"] (["a"-"z", "A"-"Z", "_", "0"-"9", "-", "*", "+", "_"])* >
+|  <QUOTED_ATOM : ("\'" ((~["\'"])*) "\'")>
 }
 
 
 
 Tree<String> tree() :
 {
-	Token label;
+	String label;
 	List<Tree<String>> subterms = new ArrayList<Tree<String>>();
 	Tree subtree;
 }
 {
-	label = <ATOM> "(" 
+	label = atom() "(" 
                (subtree = tree() { subterms.add(subtree); })
                ("," subtree = tree() { subterms.add(subtree); })*
         	 ")" {
-		return Tree.create(label.image, subterms);
+		return Tree.create(label, subterms);
 	}
 	
-        | label = <ATOM> {
-	    return Tree.create(label.image, new Tree[0]);
+        | label = atom() {
+	    return Tree.create(label, new Tree[0]);
          }
+}
+
+String atom() :
+{
+    Token label;
+}
+{
+    label = <ATOM> { return label.image;}
+    | label = <QUOTED_ATOM> { return label.image.substring(1, label.image.length()-1); }
 }

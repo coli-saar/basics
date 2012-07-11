@@ -7,6 +7,7 @@ package de.up.ling.tree;
 import com.google.common.base.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -16,6 +17,7 @@ public class Tree<E> implements Cloneable {
     private E label;
     private List<Tree<E>> children;
     private boolean allowCaching = true;
+    private static final Pattern NON_QUOTING_PATTERN = Pattern.compile("[a-zA-z*+_]([a-zA-Z0-9_*+-]*)"); //   <ATOM : ["a"-"z", "A"-"Z", "*", "+", "_"] (["a"-"z", "A"-"Z", "_", "0"-"9", "-", "*", "+", "_"])* >
 
     private Tree() {
     }
@@ -195,7 +197,7 @@ public class Tree<E> implements Cloneable {
     }
 
     private void printAsString(StringBuilder buf) {
-        buf.append(label.toString());
+        buf.append(encodeLabel());
 
         if (!children.isEmpty()) {
             buf.append("(");
@@ -208,6 +210,18 @@ public class Tree<E> implements Cloneable {
             }
             buf.append(")");
         }
+    }
+    
+    
+    private String encodeLabel() {
+        String x = label.toString();
+
+        if( !NON_QUOTING_PATTERN.matcher(x).matches() ) {
+            return "'" + x + "'";
+        } else {
+            return x;
+        }
+        
     }
 
     @Override
