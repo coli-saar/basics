@@ -164,6 +164,44 @@ public class Tree<E> implements Cloneable {
         });
     }
     
+    /**
+     * Returns the subtree at a certain path. Paths are words from N*,
+     * 0 is the first child. "start" specifies the position in the selector
+     * string at which the path starts.
+     * 
+     * @param selector
+     * @param start
+     * @return 
+     */
+    public Tree<E> select(String selector, int start) {
+        if( start == selector.length()-1 ) {
+            return this;
+        } else {
+            return children.get(selector.charAt(start)-'0').select(selector, start+1);
+        }
+    }
+    
+    /**
+     * Returns the labels of the leaves, from left to right.
+     * 
+     * @return 
+     */
+    public List<E> getLeafLabels() {
+        final List<E> ret = new ArrayList<E>();
+        
+        dfs(new TreeVisitor<E, Void, Void>() {
+            @Override
+            public Void combine(Tree<E> node, List<Void> childrenValues) {
+                if( childrenValues.isEmpty() ) {
+                    ret.add(node.getLabel());
+                }
+                return null;
+            }            
+        });
+        
+        return ret;
+    }
+    
     /*
      * Adds a given subtree as the rightmost daughter of this
      * tree's root. Returns the modified tree.
