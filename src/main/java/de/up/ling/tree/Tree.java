@@ -174,7 +174,7 @@ public class Tree<E> implements Cloneable {
      * @return 
      */
     public Tree<E> select(String selector, int start) {
-        if( start == selector.length()-1 ) {
+        if( start == selector.length() ) {
             return this;
         } else {
             return children.get(selector.charAt(start)-'0').select(selector, start+1);
