@@ -146,6 +146,9 @@ public class Tree<E> implements Cloneable {
      * Returns a new tree that is like the current one,
      * except that all nodes that match the substitutionTest
      * have been replaced by the treeToSubstitute.
+     * 
+     * TODO - perhaps we want the more general substitution
+     * approach from TreeAutomaton#run here.
      */
     public Tree<E> substitute(final Predicate<Tree<E>> substitutionTest, final Tree<E> treeToSubstitute) {
         // NOTE - this could probably be made more efficient by only
