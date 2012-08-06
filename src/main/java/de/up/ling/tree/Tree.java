@@ -6,6 +6,7 @@ package de.up.ling.tree;
 
 import com.google.common.base.Predicate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -40,7 +41,7 @@ public class Tree<E> implements Cloneable {
 
         return ret;
     }
-    
+
     /*
      * Returns a tree with a single node with the given label.
      */
@@ -53,11 +54,11 @@ public class Tree<E> implements Cloneable {
     }
 
     /**
-     * Returns the list of children (= subtrees) of this tree.
-     * It is _strongly_ recommended that you do not modify the contents
-     * of this list, as this may break things.
-     * 
-     * @return 
+     * Returns the list of children (= subtrees) of this tree. It is _strongly_
+     * recommended that you do not modify the contents of this list, as this may
+     * break things.
+     *
+     * @return
      */
     public List<Tree<E>> getChildren() {
         return children;
@@ -166,45 +167,81 @@ public class Tree<E> implements Cloneable {
             }
         });
     }
-    
+
     /**
-     * Returns the subtree at a certain path. Paths are words from N*,
-     * 0 is the first child. "start" specifies the position in the selector
-     * string at which the path starts.
-     * 
+     * Returns the subtree at a certain path. Paths are words from N*, 0 is the
+     * first child. "start" specifies the position in the selector string at
+     * which the path starts.
+     *
      * @param selector
      * @param start
-     * @return 
+     * @return
      */
     public Tree<E> select(String selector, int start) {
-        if( start == selector.length() ) {
+        if (start == selector.length()) {
             return this;
         } else {
-            return children.get(selector.charAt(start)-'0').select(selector, start+1);
+            return children.get(selector.charAt(start) - '0').select(selector, start + 1);
         }
     }
+
+    public Collection<String> getAllPaths() {
+        return getAllPathsBelow("");
+    }
     
+    public Collection<String> getAllPathsBelow(String selector) { 
+        return getAllPathsBelow(selector, new Predicate<Tree<E>>() {
+            public boolean apply(Tree<E> t) {
+                return true;
+            }
+        });
+    }
+    
+    public Collection<String> getAllPathsToLeaves() {
+        return getAllPathsBelow("", new Predicate<Tree<E>>() {
+            public boolean apply(Tree<E> t) {
+                return t.getChildren().isEmpty();
+            }
+        });
+    }
+
+    private Collection<String> getAllPathsBelow(String selector, Predicate<Tree<E>> test) {
+        final List<String> ret = new ArrayList<String>();
+        select(selector, 0).collectPathsBelowVisit(selector, test, ret);
+        return ret;
+    }
+
+    private void collectPathsBelowVisit(String path, Predicate<Tree<E>> test, List<String> accu) {
+        if (test.apply(this)) {
+            accu.add(path);
+        }
+
+        for (int i = 0; i < children.size(); i++) {
+            children.get(i).collectPathsBelowVisit(path + i, test, accu);
+        }
+    }
+
     /**
      * Returns the labels of the leaves, from left to right.
-     * 
-     * @return 
+     *
+     * @return
      */
     public List<E> getLeafLabels() {
         final List<E> ret = new ArrayList<E>();
-        
+
         dfs(new TreeVisitor<E, Void, Void>() {
             @Override
             public Void combine(Tree<E> node, List<Void> childrenValues) {
-                if( childrenValues.isEmpty() ) {
+                if (childrenValues.isEmpty()) {
                     ret.add(node.getLabel());
                 }
                 return null;
-            }            
+            }
         });
-        
+
         return ret;
     }
-    
+
     /*
      * Adds a given subtree as the rightmost daughter of this
      * tree's root. Returns the modified tree.
@@ -252,17 +289,16 @@ public class Tree<E> implements Cloneable {
             buf.append(")");
         }
     }
-    
-    
+
     private String encodeLabel() {
         String x = label.toString();
 
-        if( !NON_QUOTING_PATTERN.matcher(x).matches() ) {
+        if (!NON_QUOTING_PATTERN.matcher(x).matches()) {
             return "'" + x + "'";
         } else {
             return x;
         }
-        
+
     }
 
     @Override
@@ -300,20 +336,17 @@ public class Tree<E> implements Cloneable {
 
         return cachedHashCode;
     }
-    
-    
-    
     // cached hashCode and toString
     private int cachedHashCode = 0;
     private String cachedToString = null;
-    
+
     /**
-     * Invalidates internal caches. Because a Tree usually represents
-     * an immutable tree, certain expensive-to-compute values (such as
-     * the results of toString and hashCode) are cached after they are
-     * first computed. If you destructively modify a Tree object, you should
-     * call invalidateCache to ensure that the cached values are recomputed.
-     * 
+     * Invalidates internal caches. Because a Tree usually represents an
+     * immutable tree, certain expensive-to-compute values (such as the results
+     * of toString and hashCode) are cached after they are first computed. If
+     * you destructively modify a Tree object, you should call invalidateCache
+     * to ensure that the cached values are recomputed.
+     *
      */
     public void invalidateCache() {
         cachedHashCode = 0;
@@ -321,25 +354,25 @@ public class Tree<E> implements Cloneable {
     }
 
     /**
-     * Changes the label of this node. You should only use this method
-     * if you know what you're doing, as it may change the internal state
-     * of the Tree object in unpredictable ways.
-     * 
-     * @param label 
+     * Changes the label of this node. You should only use this method if you
+     * know what you're doing, as it may change the internal state of the Tree
+     * object in unpredictable ways.
+     *
+     * @param label
      */
     public void setLabel(E label) {
         this.label = label;
         invalidateCache();
     }
-    
+
     /**
-     * Sets the caching policy for this tree. The default is that
-     * the hashcode and toString for the tree are only computed once.
-     * This is appropriate as long as the trees are used as immutable objects,
-     * which they usually should. If the trees are modified, this method
-     * can be used to switch off caching.
-     * 
-     * @param allowCaching 
+     * Sets the caching policy for this tree. The default is that the hashcode
+     * and toString for the tree are only computed once. This is appropriate as
+     * long as the trees are used as immutable objects, which they usually
+     * should. If the trees are modified, this method can be used to switch off
+     * caching.
+     *
+     * @param allowCaching
      */
     public void setCachingPolicy(boolean allowCaching) {
         this.allowCaching = allowCaching;

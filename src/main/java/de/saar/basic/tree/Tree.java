@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class Tree<E> {
     private Map<String, List<String>> children;
     private Map<String, String> parents;
