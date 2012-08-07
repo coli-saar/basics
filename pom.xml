@@ -106,6 +106,6 @@
 
 
   <scm>
-    <developerConnection>scm:svn:https://svn.ling.uni-potsdam.de/penguin/trunk</developerConnection>
+    <developerConnection>scm:svn:https://svn.ling.uni-potsdam.de/penguin</developerConnection>
   </scm>
 </project>
