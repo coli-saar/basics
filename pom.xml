@@ -4,7 +4,7 @@
     <groupId>de.saar.coli</groupId>
     <artifactId>basics</artifactId>
     <packaging>jar</packaging>
-    <version>1.2.20-SNAPSHOT</version>
+    <version>1.2.20</version>
     <name>basics</name>
     <url>http://maven.apache.org</url>
 
@@ -106,6 +106,6 @@
 
 
   <scm>
-    <developerConnection>scm:svn:https://svn.ling.uni-potsdam.de/penguin</developerConnection>
+    <developerConnection>scm:svn:https://svn.ling.uni-potsdam.de/penguin/tags/basics-1.2.20</developerConnection>
   </scm>
 </project>
