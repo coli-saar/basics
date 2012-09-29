@@ -264,18 +264,23 @@ public class Tree<E> implements Cloneable {
 
     @Override
     public String toString() {
+        return toString(NON_QUOTING_PATTERN);
+    }
+    
+    public String toString(Pattern nonQuotingPattern) {
         if (!allowCaching || cachedToString == null) {
             StringBuilder buf = new StringBuilder();
 
-            printAsString(buf);
+            printAsString(buf, nonQuotingPattern);
             cachedToString = buf.toString();
         }
 
         return cachedToString;
     }
+    
 
-    private void printAsString(StringBuilder buf) {
-        buf.append(encodeLabel());
+    private void printAsString(StringBuilder buf, Pattern nonQuotingPattern) {
+        buf.append(encodeLabel(nonQuotingPattern));
 
         if (!children.isEmpty()) {
             buf.append("(");
@@ -284,16 +289,16 @@ public class Tree<E> implements Cloneable {
                     buf.append(",");
                 }
 
-                children.get(i).printAsString(buf);
+                children.get(i).printAsString(buf, nonQuotingPattern);
             }
             buf.append(")");
         }
     }
 
-    private String encodeLabel() {
+    private String encodeLabel(Pattern nonQuotingPattern) {
         String x = label.toString();
 
-        if (!NON_QUOTING_PATTERN.matcher(x).matches()) {
+        if (!nonQuotingPattern.matcher(x).matches()) {
             return "'" + x + "'";
         } else {
             return x;

@@ -4,6 +4,7 @@ import org.junit.*
 import java.util.*
 import java.io.*
 import static org.junit.Assert.*
+import java.util.regex.Pattern
 
 class TreeTest {
     @Test
@@ -33,6 +34,19 @@ class TreeTest {
         List gold = ["f", "a", "g", "b"];
         
         assertEquals(gold, labels)
+    }
+    
+    @Test
+    public void testToStringQuoting() {
+        Tree t = p("'  f  '('?_*')")
+        assertEquals("'  f  '('?_*')", t.toString())
+    }
+
+    @Test
+    public void testToStringQuotingCustomized() {
+        Pattern pat = Pattern.compile("[a-zA-z*+_?]([a-zA-Z0-9_*+-]*)");
+        Tree t = p("'  f  '('?_*')")
+        assertEquals("'  f  '(?_*)", t.toString(pat))
     }
     
     
