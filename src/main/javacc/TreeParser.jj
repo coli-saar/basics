@@ -34,6 +34,7 @@ SKIP : { " " | "\r" | "\t" | "\n" }
 TOKEN : {
    <ATOM : ["a"-"z", "A"-"Z", "*", "+", "_", "@"] (["a"-"z", "A"-"Z", "_", "0"-"9", "-", "*", "+", "_", "@"])* >
 |  <QUOTED_ATOM : ("\'" ((~["\'"])*) "\'")>
+| <DOUBLE_QUOTED_ATOM : ("\"" ((~["\""])*) "\"")>
 }
 
 
@@ -64,4 +65,5 @@ String atom() :
 {
     label = <ATOM> { return label.image;}
     | label = <QUOTED_ATOM> { return label.image.substring(1, label.image.length()-1); }
+   | label = <DOUBLE_QUOTED_ATOM> { return label.image.substring(1, label.image.length()-1); }
 }

@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
  * @author koller
  */
 public class Tree<E> implements Cloneable {
+
     private E label;
     private List<Tree<E>> children;
     private boolean allowCaching = true;
@@ -188,15 +189,15 @@ public class Tree<E> implements Cloneable {
     public Collection<String> getAllPaths() {
         return getAllPathsBelow("");
     }
-    
-    public Collection<String> getAllPathsBelow(String selector) { 
+
+    public Collection<String> getAllPathsBelow(String selector) {
         return getAllPathsBelow(selector, new Predicate<Tree<E>>() {
             public boolean apply(Tree<E> t) {
                 return true;
             }
         });
     }
-    
+
     public Collection<String> getAllPathsToLeaves() {
         return getAllPathsBelow("", new Predicate<Tree<E>>() {
             public boolean apply(Tree<E> t) {
@@ -266,7 +267,7 @@ public class Tree<E> implements Cloneable {
     public String toString() {
         return toString(NON_QUOTING_PATTERN);
     }
-    
+
     public String toString(Pattern nonQuotingPattern) {
         if (!allowCaching || cachedToString == null) {
             StringBuilder buf = new StringBuilder();
@@ -277,7 +278,6 @@ public class Tree<E> implements Cloneable {
 
         return cachedToString;
     }
-    
 
     private void printAsString(StringBuilder buf, Pattern nonQuotingPattern) {
         buf.append(encodeLabel(nonQuotingPattern));
@@ -295,15 +295,53 @@ public class Tree<E> implements Cloneable {
         }
     }
 
-    private String encodeLabel(Pattern nonQuotingPattern) {
-        String x = label.toString();
+    public String toLispString() {
+        StringBuilder buf = new StringBuilder();
+        printAsLispString(buf, NON_QUOTING_PATTERN);
+        return buf.toString();
+    }
 
+    private void printAsLispString(StringBuilder buf, Pattern nonQuotingPattern) {
+        if (children.isEmpty()) {
+            buf.append(encodeLabel(nonQuotingPattern));
+        } else {
+            buf.append("(");
+            buf.append(encodeLabel(nonQuotingPattern));
+
+            for (Tree<E> child : children) {
+                buf.append(" ");
+                child.printAsLispString(buf, nonQuotingPattern);
+            }
+
+            buf.append(")");
+        }
+    }
+
+    private String encodeLabel(Pattern nonQuotingPattern) {
+        return encodeLabel(label.toString(), nonQuotingPattern);
+    }
+
+    public static String encodeLabel(String x, Pattern nonQuotingPattern) {
         if (!nonQuotingPattern.matcher(x).matches()) {
-            return "'" + x + "'";
+            return quote(x);
+        } else if ("feature".equals(x) || "interpretation".equals(x)) {
+            return "\'" + x + "\'";
         } else {
             return x;
         }
+    }
 
+    private static String quote(String x) {
+        char quote = '\'';
+        if (x.contains("\'")) {
+            quote = '\"';
+        }
+
+        return quote + x + quote;
+    }
+
+    public static String encodeLabel(String x) {
+        return encodeLabel(x, NON_QUOTING_PATTERN);
     }
 
     @Override
