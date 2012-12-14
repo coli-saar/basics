@@ -120,6 +120,6 @@
 
 
   <scm>
-    <developerConnection>scm:svn:https://svn.ling.uni-potsdam.de/penguin</developerConnection>
+    <developerConnection>scm:svn:https://svn.ling.uni-potsdam.de/penguin/trunk/Code/basics</developerConnection>
   </scm>
 </project>
