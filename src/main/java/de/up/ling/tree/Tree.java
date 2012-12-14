@@ -321,13 +321,14 @@ public class Tree<E> implements Cloneable {
         return encodeLabel(label.toString(), nonQuotingPattern);
     }
 
-    public static String encodeLabel(String x, Pattern nonQuotingPattern) {
-        if (!nonQuotingPattern.matcher(x).matches()) {
-            return quote(x);
-        } else if ("feature".equals(x) || "interpretation".equals(x)) {
-            return "\'" + x + "\'";
+    public static String encodeLabel(Object x, Pattern nonQuotingPattern) {
+        String xs = x.toString();
+        if (!nonQuotingPattern.matcher(xs).matches()) {
+            return quote(xs);
+        } else if ("feature".equals(xs) || "interpretation".equals(xs)) {
+            return "\'" + xs + "\'";
         } else {
-            return x;
+            return xs;
         }
     }
 
@@ -340,7 +341,7 @@ public class Tree<E> implements Cloneable {
         return quote + x + quote;
     }
 
-    public static String encodeLabel(String x) {
+    public static String encodeLabel(Object x) {
         return encodeLabel(x, NON_QUOTING_PATTERN);
     }
 
