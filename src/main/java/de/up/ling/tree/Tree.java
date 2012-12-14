@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
+import javax.swing.JFrame;
 
 /**
  *
@@ -420,5 +421,14 @@ public class Tree<E> implements Cloneable {
      */
     public void setCachingPolicy(boolean allowCaching) {
         this.allowCaching = allowCaching;
+    }
+    
+    /**
+     * Draws this tree into a new JFrame.
+     * 
+     * @return 
+     */
+    public JFrame draw() {
+        return TreeDrawer.draw(this);
     }
 }
