@@ -58,13 +58,13 @@ public class TreePanel<E> extends JPanel {
         public int getSwingY() {
             return top + CHARACTER_HEIGHT;
         }
-        
+
         public int getTextCenterX() {
-            return left + width()/2;
+            return left + width() / 2;
         }
-        
+
         public int getTextCenterY() {
-            return top + CHARACTER_HEIGHT/2;
+            return top + CHARACTER_HEIGHT / 2;
         }
 
         public int height() {
@@ -85,8 +85,6 @@ public class TreePanel<E> extends JPanel {
         public String toString() {
             return "[top=" + top + ", left=" + left + ", bottom=" + bottom + ", right=" + right + ", label=" + label + ']';
         }
-        
-        
     }
 
     private void shiftRight(Tree<LabelAtPosition> tree, final int x) {
@@ -108,8 +106,6 @@ public class TreePanel<E> extends JPanel {
             }
         });
     }
-    
-    
     private static final int XGAP = 10;
     private static final int YLEVEL = 50;
     private static final int CHARACTER_HEIGHT = 10;
@@ -134,12 +130,12 @@ public class TreePanel<E> extends JPanel {
                     offset += child.getLabel().width() + XGAP;
                     bottom = Math.max(bottom, child.getLabel().height());
                 }
-                
+
                 // remove extra XGAP
-                if( offset > 0 ) {
+                if (offset > 0) {
                     offset -= XGAP;
                 }
-                
+
                 int right = Math.max(offset, getLabelWidth(node.getLabel().toString()));
                 bottom = Math.max(bottom, CHARACTER_HEIGHT);
 
@@ -149,10 +145,13 @@ public class TreePanel<E> extends JPanel {
         });
     }
 
-    private void drawShortenedLine(int x1, int y1, int x2, int y2, Graphics graphics) {
-        float m = ((float)y2-y1)/(x2-x1);
+    private void drawShortenedLine(int x1, int y1, int x2, int y2, int ydiff, float xshorten, Graphics graphics) {
+        int diffx = x2 - x1;
+        int diffy = y2 - y1;
+
+        graphics.drawLine((int) (x1 + xshorten * diffx), (int) (y1 + ydiff), (int) (x2 - xshorten * diffx), (int) (y2 - ydiff));
     }
-    
+
     @Override
     public void paint(final Graphics grphcs) {
         currentGraphics = grphcs;
@@ -168,12 +167,12 @@ public class TreePanel<E> extends JPanel {
             public Void visit(Tree<LabelAtPosition> node, Void data) {
                 LabelAtPosition l = node.getLabel();
                 grphcs.drawString(l.label, l.getSwingX(), l.getSwingY());
-                
-                for( Tree<LabelAtPosition> childT : node.getChildren() ) {
+
+                for (Tree<LabelAtPosition> childT : node.getChildren()) {
                     LabelAtPosition child = childT.getLabel();
-                    grphcs.drawLine(l.getTextCenterX(), l.getTextCenterY(), child.getTextCenterX(), child.getTextCenterY());
+                    drawShortenedLine(l.getTextCenterX(), l.getTextCenterY(), child.getTextCenterX(), child.getTextCenterY(), CHARACTER_HEIGHT, 0.1f, grphcs);
                 }
-                
+
                 return null;
             }
         });
