@@ -27,19 +27,6 @@
             <version>1.0-rc-5</version>
             <scope>test</scope>
         </dependency>
-        
-        <dependency>
-            <groupId>jgraph</groupId>
-            <artifactId>jgraph</artifactId>
-            <version>5.8.3.1</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>jgraph</groupId>
-            <artifactId>jgraphaddons</artifactId>
-            <version>chorus</version>
-        </dependency>
-
 
         <dependency>
             <groupId>junit</groupId>
