@@ -12,11 +12,12 @@ import java.util.regex.Pattern;
 import javax.swing.JFrame;
 
 /**
- *
+ * An immutable tree. The nodes of the tree are labeled with objects
+ * of type E.
+ * 
  * @author koller
  */
 public class Tree<E> implements Cloneable {
-
     private E label;
     private List<Tree<E>> children;
     private boolean allowCaching = true;
@@ -25,6 +26,15 @@ public class Tree<E> implements Cloneable {
     private Tree() {
     }
 
+    /**
+     * Creates a new tree whose root is labelled with "label" and which
+     * has the given subtrees.
+     * 
+     * @param <E>
+     * @param label
+     * @param children
+     * @return 
+     */
     public static <E> Tree<E> create(E label, Tree[] children) {
         List<Tree<E>> childrenAsList = new ArrayList<Tree<E>>(children.length);
 
@@ -35,6 +45,16 @@ public class Tree<E> implements Cloneable {
         return create(label, childrenAsList);
     }
 
+    
+    /**
+     * Creates a new tree whose root is labelled with "label" and which
+     * has the given subtrees.
+     * 
+     * @param <E>
+     * @param label
+     * @param children
+     * @return 
+     */
     public static <E> Tree<E> create(E label, List<Tree<E>> children) {
         Tree<E> ret = new Tree<E>();
 
@@ -44,13 +64,18 @@ public class Tree<E> implements Cloneable {
         return ret;
     }
 
-    /*
+    /**
      * Returns a tree with a single node with the given label.
      */
     public static <E> Tree<E> create(E label) {
         return create(label, new ArrayList<Tree<E>>());
     }
 
+    /**
+     * Returns the label of the tree's root.
+     * 
+     * @return 
+     */
     public E getLabel() {
         return label;
     }
@@ -66,8 +91,9 @@ public class Tree<E> implements Cloneable {
         return children;
     }
 
-    /*
+    /**
      * Return list of all nodes of this tree, in pre-order.
+     * Runtime of this method is O(|V|).
      */
     public List<Tree<E>> getAllNodes() {
         final List<Tree<E>> ret = new ArrayList<Tree<E>>();
@@ -83,6 +109,12 @@ public class Tree<E> implements Cloneable {
         return ret;
     }
 
+    /**
+     * Returns the height of the tree. The height of a leaf is 0;
+     * the height of the tree f(t1,...,tn) is 1 + max_i height(ti).
+     * 
+     * @return 
+     */
     public int getHeight() {
         int max = 0;
 
@@ -96,6 +128,13 @@ public class Tree<E> implements Cloneable {
         return max;
     }
 
+    /**
+     * Returns the maximum arity of the nodes in this tree.
+     * The arity of a node is the number of children.
+     * The runtime of this method is O(|V|).
+     * 
+     * @return 
+     */
     public int getMaximumArity() {
         int max = children.size();
 
@@ -109,6 +148,21 @@ public class Tree<E> implements Cloneable {
         return max;
     }
 
+    /**
+     * Performs a depth-first search on the tree. This method takes
+     * an argument of class TreeVisitor which defines the actions that
+     * should be taken when nodes are being visited: visit is called
+     * whenever a node is first visited by the DFS, and combine is called
+     * whenever a ndoe is processed again after the DFS has returned from
+     * all of its children. See the documentation for the class TreeVisitor
+     * for details. The dfs method returns the value that is returned
+     * by the call to "combine" for the root.
+     * 
+     * @param <Down>
+     * @param <Up>
+     * @param visitor
+     * @return 
+     */
     public <Down, Up> Up dfs(TreeVisitor<E, Down, Up> visitor) {
         // NOTE - this could probably be made more efficient
         // by using an object pool for childValues lists.
@@ -126,6 +180,13 @@ public class Tree<E> implements Cloneable {
         return visitor.combine(this, childValues);
     }
 
+    /**
+     * Returns true iff there is a node in the tree for which the
+     * given predicate returns true.
+     * 
+     * @param test
+     * @return 
+     */
     public boolean some(final Predicate<E> test) {
         return dfs(new TreeVisitor<E, Void, Boolean>() {
             @Override
@@ -145,7 +206,7 @@ public class Tree<E> implements Cloneable {
         });
     }
 
-    /*
+    /**
      * Returns a new tree that is like the current one,
      * except that all nodes that match the substitutionTest
      * have been replaced by the treeToSubstitute.
@@ -172,7 +233,8 @@ public class Tree<E> implements Cloneable {
 
     /**
      * Returns the subtree at a certain path. Paths are words from N*, 0 is the
-     * first child. "start" specifies the position in the selector string at
+     * first child. The empty string corresponds to the root of the tree.
+     * "start" specifies the position in the selector string at
      * which the path starts.
      *
      * @param selector
@@ -187,10 +249,24 @@ public class Tree<E> implements Cloneable {
         }
     }
 
+    /**
+     * Returns a collection of all paths that lead to nodes in the tree.
+     * See #select for an explanation of paths.
+     * 
+     * @return 
+     */
     public Collection<String> getAllPaths() {
         return getAllPathsBelow("");
     }
 
+    /**
+     * Returns a collection of all paths to nodes in this tree that
+     * start with the given prefix. In other words, returns the set of
+     * all nodes below the given node.
+     * 
+     * @param selector
+     * @return 
+     */
     public Collection<String> getAllPathsBelow(String selector) {
         return getAllPathsBelow(selector, new Predicate<Tree<E>>() {
             public boolean apply(Tree<E> t) {
@@ -199,6 +275,11 @@ public class Tree<E> implements Cloneable {
         });
     }
 
+    /**
+     * Returns a collection of all paths that lead to leaves of this tree.
+     * 
+     * @return 
+     */
     public Collection<String> getAllPathsToLeaves() {
         return getAllPathsBelow("", new Predicate<Tree<E>>() {
             public boolean apply(Tree<E> t) {
@@ -244,9 +325,10 @@ public class Tree<E> implements Cloneable {
         return ret;
     }
 
-    /*
-     * Adds a given subtree as the rightmost daughter of this
-     * tree's root. Returns the modified tree.
+    /**
+     * Adds a subtree to the root of this tree. The method leaves
+     * the tree on which it is called unmodified, and returns a modified
+     * tree in which the root has an extra child, namely the given subtree.
      */
     public Tree<E> addSubtree(Tree<E> subtree) {
         List<Tree<E>> children = new ArrayList<Tree<E>>(this.children);
@@ -254,6 +336,11 @@ public class Tree<E> implements Cloneable {
         return create(label, children);
     }
 
+    /**
+     * Returns a clone of this tree.
+     * 
+     * @return 
+     */
     @Override
     public Object clone() {
         return dfs(new TreeVisitor<E, Void, Tree<E>>() {
@@ -264,11 +351,31 @@ public class Tree<E> implements Cloneable {
         });
     }
 
+    /**
+     * Returns a string representation of this tree.
+     * Labels in the string are guaranteed to be quoted in such a way
+     * that the string can be parsed by the TreeParser, and the result
+     * will be equals to the original tree. An example output is
+     * "f(g(a),b)". If the node with label "a" is instead labeled with
+     * "c d" (note the space), the result will be "f(g('c d'),b)".
+     * 
+     * @return 
+     */
     @Override
     public String toString() {
         return toString(NON_QUOTING_PATTERN);
     }
 
+    /**
+     * Returns a string representation of this tree, given a
+     * specific regex for non-quoting. The nonQuotingPattern regulates
+     * what labels will be surrounded by quotes when creating the
+     * string representation: every label will be quoted, except
+     * if it matches the regex.
+     * 
+     * @param nonQuotingPattern
+     * @return 
+     */
     public String toString(Pattern nonQuotingPattern) {
         if (!allowCaching || cachedToString == null) {
             StringBuilder buf = new StringBuilder();
@@ -296,6 +403,11 @@ public class Tree<E> implements Cloneable {
         }
     }
 
+    /**
+     * Returns a string representation of the tree, in Lisp format.
+     * Node labels are quoted as in #toString. An example output is
+     * "(f (g a) b)".
+     */
     public String toLispString() {
         StringBuilder buf = new StringBuilder();
         printAsLispString(buf, NON_QUOTING_PATTERN);
@@ -342,10 +454,23 @@ public class Tree<E> implements Cloneable {
         return quote + x + quote;
     }
 
+    /**
+     * Quotes the string representation of the object x if necessary.
+     * "If necessary" is defined by the standard non-quoting pattern,
+     * as used in #toString.
+     * 
+     */
     public static String encodeLabel(Object x) {
         return encodeLabel(x, NON_QUOTING_PATTERN);
     }
 
+    /**
+     * Checks whether two trees are equal. Trees are considered equal
+     * if they have the same shape and corresponding labels are equal.
+     * 
+     * @param o
+     * @return 
+     */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Tree)) {
@@ -371,6 +496,11 @@ public class Tree<E> implements Cloneable {
         }
     }
 
+    /**
+     * Computes a hashcode that is consistent with #equals.
+     * 
+     * @return 
+     */
     @Override
     public int hashCode() {
         if (!allowCaching || cachedHashCode == 0) {
@@ -424,7 +554,7 @@ public class Tree<E> implements Cloneable {
     }
     
     /**
-     * Draws this tree into a new JFrame.
+     * Opens a new JFrame and draws this tree into it.
      * 
      * @return 
      */
