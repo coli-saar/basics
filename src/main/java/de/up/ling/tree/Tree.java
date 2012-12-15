@@ -429,6 +429,6 @@ public class Tree<E> implements Cloneable {
      * @return 
      */
     public JFrame draw() {
-        return TreeDrawer.draw(this);
+        return TreePanel.draw(this);
     }
 }

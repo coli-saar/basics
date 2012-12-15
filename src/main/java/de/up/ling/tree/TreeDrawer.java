@@ -12,10 +12,7 @@ import java.awt.HeadlessException;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +41,7 @@ public class TreeDrawer {
     private JGraph graph;
     private final Map<String, DefaultGraphCell> nodeForName = new HashMap<String, DefaultGraphCell>();
 
+    
     public static <E> JFrame draw(Tree<E> tree) {
         JFrame f = new TreeFrame("Tree: " + tree.toString());
         JGraph g = new JGraph();
@@ -69,26 +67,34 @@ public class TreeDrawer {
 
         int N = tree.getAllNodes().size();
         allNodes = new Object[N];
-        final List<DefaultGraphCell> cells = new ArrayList<DefaultGraphCell>(N);
+
+
+//        final List<DefaultGraphCell> cells = new ArrayList<DefaultGraphCell>(N);
 
         this.graph = graph;
 
-        tree.dfs(new TreeVisitor<E, Void, DefaultGraphCell>() {
+        Tree<DefaultGraphCell> cells = tree.dfs(new TreeVisitor<E, Void, Tree<DefaultGraphCell>>() {
             @Override
-            public DefaultGraphCell combine(Tree<E> node, List<DefaultGraphCell> childrenValues) {
+            public Tree<DefaultGraphCell> combine(Tree<E> node, List<Tree<DefaultGraphCell>> childrenValues) {
                 DefaultGraphCell cell = addNode(node.getLabel().toString(), graph);
-                cells.add(cell);
 
-                for (DefaultGraphCell child : childrenValues) {
-                    addEdge(cell, child, graph);
+                for (Tree<DefaultGraphCell> child : childrenValues) {
+                    addEdge(cell, child.getLabel(), graph);
                 }
 
-                return cell;
+                return Tree.create(cell, childrenValues);
             }
         });
 
-        Collections.reverse(cells);
-        cells.toArray(allNodes);
+        cells.dfs(new TreeVisitor<DefaultGraphCell, Void, Void>() {
+            private int i = 0;
+
+            @Override
+            public Void visit(Tree<DefaultGraphCell> node, Void data) {
+                allNodes[i++] = node.getLabel();
+                return null;
+            }
+        });
     }
 
     public void computeLayout(JGraph graph) {
@@ -214,33 +220,5 @@ public class TreeDrawer {
         return ret;
     }
 
-    // A TreeFrame is supposed to be closable by pressing Cmd-W.
-    // For some reason that I don't understand, this doesn't quite work.
-    private static class TreeFrame extends JFrame {
-        public TreeFrame(String title) throws HeadlessException {
-            super(title);
-            
-            getRootPane().getActionMap().put("close-window", new CloseAction(this));
-            getRootPane().getInputMap().put(KeyStroke.getKeyStroke("control W"), "close-window");
-            getRootPane().getInputMap().put(KeyStroke.getKeyStroke("meta W"), "close-window");
-        }
-    }
-
-    private static class CloseAction extends AbstractAction {
-        private Window window;
-
-        public CloseAction(Window window) {
-            this.window = window;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (window == null) {
-                return;
-            }
-            
-            window.setVisible(false);
-            window.dispose();
-        }
-    }
+    
 }
