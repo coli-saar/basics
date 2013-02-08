@@ -7,7 +7,9 @@ package de.up.ling.tree;
 import com.google.common.base.Predicate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
 
@@ -562,5 +564,27 @@ public class Tree<E> implements Cloneable {
      */
     public JFrame draw() {
         return TreePanel.draw(this);
+    }
+    
+    /**
+     * Returns a map that maps each node in the tree to its parent.
+     * The map is implemented as an IdentityHashMap, which means that
+     * the parent of a node will only be found if you call get on the node
+     * itself (and not some other tree that is equals to it).
+     * 
+     * @return 
+     */
+    public Map<Tree<E>,Tree<E>> getParentMap() {
+        final Map<Tree<E>,Tree<E>> ret = new IdentityHashMap<Tree<E>, Tree<E>>();
+        
+        dfs(new TreeVisitor<E, Tree<E>, Void>() {
+            @Override
+            public Tree<E> visit(Tree<E> node, Tree<E> parent) {
+                ret.put(node, parent);
+                return node;
+            }            
+        });
+        
+        return ret;
     }
 }
