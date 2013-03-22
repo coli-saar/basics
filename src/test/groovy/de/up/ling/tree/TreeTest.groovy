@@ -5,6 +5,8 @@ import java.util.*
 import java.io.*
 import static org.junit.Assert.*
 import java.util.regex.Pattern
+import com.google.common.base.Predicate
+import com.google.common.base.Function
 
 class TreeTest {
     @Test
@@ -49,6 +51,21 @@ class TreeTest {
         assertEquals("'  f  '(?_*)", t.toString(pat))
     }
     
+    @Test
+    public void testSubstitutePredicate() {
+        Tree t = p("f(x1,g(b))");        
+        Predicate<Tree> pred = new TestPredicate();        
+        assertEquals("f(h(c,d),g(b))", t.substitute(pred, p("h(c,d)")).toString());
+    }
+    
+    @Test
+    public void testSubstituteFunction() {
+        Tree t = p("f(x1,g(x2))");
+        Function<Tree> fct = new TestFunction();
+        assertEquals("f(h(c,d),g(k(l)))", t.substitute(fct).toString());
+    }
+    
+    
     
     public static Tree c(Object label, List children) {
         return Tree.create(label, children);
@@ -58,5 +75,25 @@ class TreeTest {
     
     public static Tree<String> p(String s) {
         return TreeParser.parse(s);
+    }
+}
+
+class TestPredicate implements Predicate {
+    public boolean apply(Object t) {
+        return ((Tree) t).getLabel().equals("x1");
+    }
+}
+    
+class TestFunction implements Function {
+    public Object apply(Object t) {
+        String label = ((Tree) t).getLabel();
+        
+        if( label.equals("x1")) {
+            return TreeTest.p("h(c,d)");
+        } else if( label.equals("x2")) {
+            return TreeTest.p("k(l)");
+        } else {
+            return null;
+        }
     }
 }

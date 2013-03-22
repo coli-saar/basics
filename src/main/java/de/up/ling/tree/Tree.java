@@ -4,6 +4,7 @@
  */
 package de.up.ling.tree;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +24,7 @@ public class Tree<E> implements Cloneable {
     private E label;
     private List<Tree<E>> children;
     private boolean allowCaching = true;
-    private static final Pattern NON_QUOTING_PATTERN = Pattern.compile("[a-zA-Z*+_]([a-zA-Z0-9_*+-]*)"); //   <ATOM : ["a"-"z", "A"-"Z", "*", "+", "_"] (["a"-"z", "A"-"Z", "_", "0"-"9", "-", "*", "+", "_"])* >
+    public static final Pattern NON_QUOTING_PATTERN = Pattern.compile("[a-zA-Z*+_]([a-zA-Z0-9_*+-]*)"); //   <ATOM : ["a"-"z", "A"-"Z", "*", "+", "_"] (["a"-"z", "A"-"Z", "_", "0"-"9", "-", "*", "+", "_"])* >
 
     private Tree() {
     }
@@ -217,10 +218,21 @@ public class Tree<E> implements Cloneable {
      * approach from TreeAutomaton#run here.
      */
     public Tree<E> substitute(final Predicate<Tree<E>> substitutionTest, final Tree<E> treeToSubstitute) {
+        return substitute(new Function<Tree<E>, Tree<E>>() {
+            public Tree<E> apply(Tree<E> t) {
+                if( substitutionTest.apply(t) ) {
+                    return treeToSubstitute;
+                } else {
+                    return null;
+                }
+            }
+        });
+        
         // NOTE - this could probably be made more efficient by only
         // copying the tree by need. If all childrenValues are == to
         // the children, then lower recursive calls have not copied;
         // in this case, we can just return this instead of Tree.create.
+        /*
         return dfs(new TreeVisitor<E, Void, Tree<E>>() {
             @Override
             public Tree<E> combine(Tree<E> node, List<Tree<E>> childrenValues) {
@@ -228,6 +240,37 @@ public class Tree<E> implements Cloneable {
                     return treeToSubstitute;
                 } else {
                     return Tree.create(node.getLabel(), childrenValues);
+                }
+            }
+        });
+        */
+    }
+    
+    /**
+     * Returns a new tree in which subtrees have been replaced
+     * as specified by the substitution. "substitution" is a function
+     * that is passed a subtree of the old tree as an argument. It may
+     * return a non-null value t to indicate that this subtree is to be
+     * replaced by t, or null to indicate that the old tree should be
+     * copied homomorphically.
+     * 
+     * @param substitution
+     * @return 
+     */
+    public Tree<E> substitute(final Function<Tree<E>, Tree<E>> substitution) {
+        // NOTE - this could probably be made more efficient by only
+        // copying the tree by need. If all childrenValues are == to
+        // the children, then lower recursive calls have not copied;
+        // in this case, we can just return this instead of Tree.create.
+        return dfs(new TreeVisitor<E, Void, Tree<E>>() {
+            @Override
+            public Tree<E> combine(Tree<E> node, List<Tree<E>> childrenValues) {
+                Tree<E> replacement = substitution.apply(node);
+                
+                if( replacement == null ) {
+                    return Tree.create(node.getLabel(), childrenValues);
+                } else {
+                    return replacement;
                 }
             }
         });
@@ -392,7 +435,6 @@ public class Tree<E> implements Cloneable {
     private void printAsString(StringBuilder buf, Pattern nonQuotingPattern) {
         String s = encodeLabel(nonQuotingPattern);
         buf.append(s);
-//        System.err.println(getLabel() + " -> " + s + " (using " + nonQuotingPattern + ")");
 
         if (!children.isEmpty()) {
             buf.append("(");
