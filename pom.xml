@@ -99,13 +99,13 @@
         <repository>
             <id>tcl-repository</id>
             <name>Potsdam TCL Maven repository</name>
-	    <url>scpexe://tcl@bramaputra.ling.uni-potsdam.de//home/tcl/tcl-web/maven2/releases</url>
+	    <url>scpexe://emma.ling.uni-potsdam.de//projects/webprojects/tcl/maven2/releases</url>
         </repository>
 
 	<site>
 	  <id>basics-site</id>
 	  <name>Potsdam Basics website</name>
-	  <url>scpexe://tcl@bramaputra.ling.uni-potsdam.de//home/tcl/tcl-web/basics</url>
+	  <url>scpexe://emma.ling.uni-potsdam.de//projects/webprojects/tcl/basics</url>
 	</site>
 
         <downloadUrl>http://www.ling.uni-potsdam.de/tcl/maven2/releases</downloadUrl>
