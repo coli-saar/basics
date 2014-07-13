@@ -9,11 +9,14 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 
 /**
  * A Swing component for drawing a tree.
@@ -23,12 +26,13 @@ import javax.swing.SwingUtilities;
 public class TreePanel<E> extends JPanel {
     private static final int XGAP = 10;
     private static final int YLEVEL = 50;
-    private static final int CHARACTER_HEIGHT = 10;
+    private static final int CHARACTER_HEIGHT = 12;
     private static final int PADX = 10;
     private static final int PADY = 10;
     private Tree<E> tree;
     private Tree<LabelAtPosition> layoutTree;
     private Graphics currentGraphics;
+    private TooltipSource<E> tooltipSource;
 
     /*
     public static void main(String[] args) {
@@ -87,7 +91,7 @@ public class TreePanel<E> extends JPanel {
         return ret;
     }
 
-    private <E> Tree<LabelAtPosition> layout(Tree<E> tree) {
+    private Tree<LabelAtPosition> layout(Tree<E> tree) {
         Tree<LabelAtPosition> ret = tree.dfs(new TreeVisitor<E, Void, Tree<LabelAtPosition>>() {
             @Override
             public Tree<LabelAtPosition> combine(Tree<E> node, List<Tree<LabelAtPosition>> childrenValues) {
@@ -134,7 +138,7 @@ public class TreePanel<E> extends JPanel {
                     textCenterX = (leftOfLeftmostChildLabel + rightOfRightmostChildLabel) / 2;
                 }
 
-                LabelAtPosition label = new LabelAtPosition(0, 0, right, bottom, textCenterX, node.getLabel().toString());
+                LabelAtPosition label = new LabelAtPosition(0, 0, right, bottom, textCenterX, node.getLabel().toString(), node);
                 return Tree.create(label, childrenValues);
             }
         });
@@ -153,6 +157,59 @@ public class TreePanel<E> extends JPanel {
         double diffy = y2 - y1;
 
         graphics.drawLine((int) (x1 + xshorten * diffx), (int) (y1 + ydiff), (int) (x2 - xshorten * diffx), (int) (y2 - ydiff));
+    }
+    
+    public static interface TooltipSource<E> {
+        public String makeTooltipLabel(Tree<E> tree);
+    }
+    
+    public void setTooltipSource(TooltipSource<E> src) {
+        this.tooltipSource = src;
+        ToolTipManager.sharedInstance().registerComponent(this);
+    }
+
+    @Override
+    public String getToolTipText(final MouseEvent e) {
+        if( layoutTree == null ) {
+            return "";
+        } else if( tooltipSource == null) {
+            return "";
+        } else if( ! containsWithPadding(layoutTree.getLabel().getBoundingRect(), e.getPoint(), 20, 20) ) {
+            // optimization: if mouse is outside the bounding box of the entire tree, then do nothing
+            return "";
+        } else {
+            String ret = layoutTree.dfs(new TreeVisitor<LabelAtPosition, Void, String>() {
+                @Override
+                public String combine(Tree<LabelAtPosition> node, List<String> childrenValues) {
+                    // check whether mouse location was within a child => return tooltip from there
+                    for( String c : childrenValues ) {
+                        if( c != null ) {
+                            return c;
+                        }
+                    }
+                    
+                    Rectangle textRect = node.getLabel().getTextRect();
+                    if( containsWithPadding(textRect, e.getPoint(), 0, 20) ) {
+                        return tooltipSource.makeTooltipLabel(node.getLabel().originalSubtree);
+                    } else {
+                        return null;
+                    }
+                }                
+            });
+            
+            if( ret == null ) {
+                return "";
+            } else {
+                return ret;
+            }
+        }
+    }
+    
+    private static boolean containsWithPadding(Rectangle rect, Point point, int minpad, int maxpad) {
+        return rect.getMinX()-minpad <= point.x
+               && rect.getMaxX()+maxpad >= point.x
+               && rect.getMinY()-minpad <= point.y
+               && rect.getMaxY()+maxpad >= point.y;
     }
 
     @Override
@@ -219,14 +276,16 @@ public class TreePanel<E> extends JPanel {
         public int top, left, bottom, right;
         public int textCenterX;
         public String label;
+        public Tree<E> originalSubtree;
 
-        public LabelAtPosition(int left, int top, int right, int bottom, int textCenterX, String label) {
+        public LabelAtPosition(int left, int top, int right, int bottom, int textCenterX, String label, Tree<E> originalSubtree) {
             this.top = top;
             this.left = left;
             this.bottom = bottom;
             this.right = right;
             this.textCenterX = textCenterX;
             this.label = label;
+            this.originalSubtree = originalSubtree;
         }
 
         public int width() {
@@ -244,6 +303,10 @@ public class TreePanel<E> extends JPanel {
         public Rectangle getTextRect() {
             int textwidth = getLabelWidth(label);
             return new Rectangle(left + textCenterX - textwidth / 2, top, textwidth, CHARACTER_HEIGHT);
+        }
+        
+        public Rectangle getBoundingRect() {
+            return new Rectangle(left, top, width(), height());
         }
 
         public int height() {
