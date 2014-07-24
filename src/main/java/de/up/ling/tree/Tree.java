@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
 
@@ -149,6 +150,15 @@ public class Tree<E> implements Cloneable {
         }
 
         return max;
+    }
+    
+    public <Up> Up dfs(final TreeBottomUpVisitor<E,Up> combiner) {
+        return dfs(new TreeVisitor<E, Void, Up>() {
+            @Override
+            public Up combine(Tree<E> node, List<Up> childrenValues) {
+                return combiner.combine(node, childrenValues);
+            }
+        });
     }
 
     /**
