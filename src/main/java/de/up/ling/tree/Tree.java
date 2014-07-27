@@ -156,6 +156,15 @@ public class Tree<E> implements Cloneable {
             }
         });
     }
+    
+    public <Up> Tree<Up> map(final Function<E,Up> fn) {
+        return dfs(new TreeVisitor<E, Void, Tree<Up>>() {
+            @Override
+            public Tree<Up> combine(Tree<E> node, List<Tree<Up>> childrenValues) {
+                return Tree.create(fn.apply(node.getLabel()), childrenValues);
+            }            
+        });
+    }
 
     /**
      * Performs a depth-first search on the tree. This method takes an argument
