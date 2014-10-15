@@ -30,14 +30,16 @@ public class Tree<E> implements Cloneable {
 
     /**
      * Creates a new tree whose root is labelled with "label" and which has the
-     * given subtrees.
+     * given subtrees. The subtrees may be given either as varargs arguments
+     * or as an explicit array. As a special case, Tree.create("a") constructs
+     * a tree with a single node (labeled "a") and no children.
      *
      * @param <E>
      * @param label
      * @param children
      * @return
      */
-    public static <E> Tree<E> create(E label, Tree[] children) {
+    public static <E> Tree<E> create(E label, Tree... children) {
         List<Tree<E>> childrenAsList = new ArrayList<Tree<E>>(children.length);
 
         for (int i = 0; i < children.length; i++) {
@@ -63,13 +65,6 @@ public class Tree<E> implements Cloneable {
         ret.children = children;
 
         return ret;
-    }
-
-    /**
-     * Returns a tree with a single node with the given label.
-     */
-    public static <E> Tree<E> create(E label) {
-        return create(label, new ArrayList<Tree<E>>());
     }
 
     /**
