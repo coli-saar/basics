@@ -6,6 +6,7 @@ package de.up.ling.tree;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -19,7 +20,7 @@ import javax.swing.JFrame;
  *
  * @author koller
  */
-public class Tree<E> implements Cloneable {
+public class Tree<E> implements Cloneable, Serializable {
     private E label;
     private List<Tree<E>> children;
     private boolean allowCaching = true;
