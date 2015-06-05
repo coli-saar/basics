@@ -14,14 +14,14 @@ import java.io.*;
 
 public class TreeParser {
 	
-    public static Tree<String> parse(String string) {
-        try {
+    public static Tree<String> parse(String string) throws ParseException {
+        //try {
             TreeParser p = new TreeParser(new StringReader(string));
             return p.tree();
-        } catch(ParseException e) {
-            System.err.println("Exception while parsing " + string + ": " + e);
-            return null;
-        }
+        //} catch(ParseException e) {
+          //  System.err.println("Exception while parsing " + string + ": " + e);
+//            return null;
+  //      }
     }
 }
 PARSER_END(TreeParser)
