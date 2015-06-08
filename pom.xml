@@ -84,6 +84,17 @@
 		<detectLinks>true</detectLinks>
 	      </configuration>
 	    </plugin>
+
+	    <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-release-plugin</artifactId>
+    <configuration>
+        <checkModificationExcludes>
+            <checkModificationExclude>target/**</checkModificationExclude>
+        </checkModificationExcludes>
+    </configuration>
+	    </plugin>
+	    
         </plugins>
 
 	<extensions>
@@ -129,7 +140,9 @@
 
 -->
 
+<!--
   <scm>
     <developerConnection>scm:hg:https://bitbucket.org/tclup/basics</developerConnection>
-  </scm>
+    </scm>
+    -->
 </project>
