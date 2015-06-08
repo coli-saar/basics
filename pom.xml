@@ -96,6 +96,15 @@
     </build>
 
     <distributionManagement>
+      <repository>
+        <id>tcl</id>
+        <name>tcl-releases</name>
+        <url>http://tcl.ling.uni-potsdam.de/artifactory/release</url>
+      </repository>
+    </distributionManagement>
+
+<!--
+    <distributionManagement>
         <repository>
             <id>tcl-repository</id>
             <name>Potsdam TCL Maven repository</name>
@@ -118,8 +127,9 @@
         </repository>
     </repositories>
 
+-->
 
   <scm>
-    <developerConnection>scm:svn:https://svn.ling.uni-potsdam.de/penguin/trunk/Code/basics</developerConnection>
+    <developerConnection>scm:hg:https://bitbucket.org/tclup/basics</developerConnection>
   </scm>
 </project>
