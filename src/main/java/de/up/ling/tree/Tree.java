@@ -289,7 +289,13 @@ public class Tree<E> implements Cloneable, Serializable {
      * Returns the subtree at a certain path. Paths are words from N*, 0 is the
      * first child. The empty string corresponds to the root of the tree.
      * "start" specifies the position in the selector string at which the path
-     * starts.
+     * starts.<p>
+     * 
+     * Note that this method interprets the selector string character by character:
+     * The selector 123 means fourth child of the third child of the second child
+     * of the root. If nodes in the tree can have more than ten children,
+     * it is safer (but less efficient) to use {@link #selectWithSeparators(java.lang.String, int, java.lang.String) }
+     * instead.
      *
      * @param selector
      * @param start
@@ -300,6 +306,40 @@ public class Tree<E> implements Cloneable, Serializable {
             return this;
         } else {
             return children.get(selector.charAt(start) - '0').select(selector, start + 1);
+        }
+    }
+    
+    /**
+     * Returns the subtree at a certain path, in trees where
+     * nodes can have more than ten children. Paths are words from N*, 0 is the
+     * first child. The empty string corresponds to the root of the tree.
+     * "start" specifies the position in the selector string at which the path
+     * starts.<p>
+     * 
+     * The individual steps in the selector are separated by the <code>separator</code>
+     * string. That is, if <code>separator</code> has the value "_", then
+     * the selector "1_10" selects the eleventh child of the second child of the
+     * root node. By contrast, "11_0" selects the first child of the twelfth
+     * child of the root. Thus this method works with trees that have an
+     * arbitrary number of nodes. However, if you know that nodes in your
+     * tree have at most ten children, the method {@link #select(java.lang.String, int) }
+     * is more efficient.
+     *
+     * @param selector
+     * @param start
+     * @return
+     */
+    public Tree<E> selectWithSeparators(String selector, int start, String separator) {
+        String[] selectors = selector.split(separator);
+        return selectFromArray(selectors, start);
+    }
+    
+    private Tree<E> selectFromArray(String[] selectors, int start) {
+        if (start == selectors.length) {
+            return this;
+        } else {
+            int childNumber = Integer.parseInt(selectors[start]);
+            return children.get(childNumber).selectFromArray(selectors, start + 1);
         }
     }
 
