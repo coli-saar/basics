@@ -147,8 +147,8 @@
   -->
 
   <scm>
-    <connection>scm:${repository.type}:${repository.local}</connection>
-    <developerConnection>scm:${repository.type}:${repository.local}</developerConnection>
-    <url>scm:${repository.type}:${repository.local}</url>
+    <connection>scm:hg:.</connection>
+    <developerConnection>scm:hg:.</developerConnection>
+    <url>scm:hg:.</url>
   </scm>
 </project>
