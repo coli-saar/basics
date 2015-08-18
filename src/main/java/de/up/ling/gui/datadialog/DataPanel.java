@@ -6,12 +6,13 @@
 package de.up.ling.gui.datadialog;
 
 import java.awt.GridLayout;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -49,14 +50,26 @@ public class DataPanel extends JPanel {
     public void addField(Field f) {
         DataField anno = f.getAnnotation(DataField.class);
         Element e = null;
-
-        if (List.class.isAssignableFrom(anno.type())) {
-            e = new ListAsComboBoxElement(f.getName(), anno.values());
-            e.setAction(x -> setField(f, x));
-            elements.add(e);
+        
+        if( Element.class.isAssignableFrom(anno.elementClass()) ) {
+            // if element type was specified explicitly, construct an instance of it
+            try {
+                Constructor<Element> con = anno.elementClass().getConstructor(String.class, DataField.class);
+                e = con.newInstance(f.getName(), anno);
+            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                Logger.getLogger(DataPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } 
+        
+        // default types per field class        
+        else if (String.class.isAssignableFrom(f.getType())) {
+            e = new StringAsTextfieldElement(f.getName());
         }
 
         if (e != null) {
+            e.setAction(x -> setField(f, x));
+            elements.add(e);
+
             add(new JLabel(anno.label()));
             add(e.getComponent());
         }
@@ -86,23 +99,22 @@ public class DataPanel extends JPanel {
 
     private static class TestClass {
 
-        @DataField(label = "lalala", type = List.class, values = {"foo", "bar"})
+        @DataField(label = "lalala")
         String lala;
 
-        @DataField(label = "zazaza", type = List.class, values = {"mein", "alter"})
+        @DataField(label = "zazaza", elementClass = ListAsComboBoxElement.class, values = {"mein", "alter"})
         String foo;
 
         @Override
         public String toString() {
             return "TestClass{" + "lala=" + lala + ", foo=" + foo + '}';
         }
-        
-        
+
     }
 
     public static void main(String[] args) {
         JFrame x = new JFrame("hallo");
-        x.setLayout(new GridLayout(0,1));
+        x.setLayout(new GridLayout(0, 1));
 
         TestClass tc = new TestClass();
         DataPanel p = DataPanel.forObject("group", tc);

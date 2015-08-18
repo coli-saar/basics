@@ -19,6 +19,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface DataField {
     String label();
-    Class type();
+    Class elementClass() default Object.class;
     String[] values() default {};
 }

@@ -6,26 +6,29 @@
 
 package de.up.ling.gui.datadialog;
 
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JTextField;
 
 /**
  *
  * @author koller
  */
-public class ListAsComboBoxElement extends Element<String> {
-    private JComboBox<Object> box;
-    
-    public ListAsComboBoxElement(String label, DataField df) {
+public class StringAsTextfieldElement extends Element<String> {
+    private JTextField tf;
+
+    public StringAsTextfieldElement(String label) {
         super(label);
-        box = new JComboBox<Object>(df.values());
-    }
-    
-    public JComponent getComponent() {
-        return box;
+        tf = new JTextField();
     }
 
+    @Override
+    public JComponent getComponent() {
+        return tf;
+    }
+
+    @Override
     public String getValue() {
-        return box.getSelectedItem().toString();
-    }    
+        return tf.getText();
+    }
+    
 }
