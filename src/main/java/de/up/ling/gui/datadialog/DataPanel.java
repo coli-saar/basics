@@ -34,10 +34,8 @@ public class DataPanel extends JPanel {
 
         elements = new ArrayList<Element>();
         this.o = o;
-        
-        Class c = o.getClass();
 
-        for (Field f : c.getDeclaredFields()) {
+        for (Field f : o.getClass().getDeclaredFields()) {
             DataField anno = f.getAnnotation(DataField.class);
             if (anno != null) {
                 addField(f);
@@ -50,9 +48,7 @@ public class DataPanel extends JPanel {
             if (o != null) {
                 f.set(o, value);
             }
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(DataPanel.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
             Logger.getLogger(DataPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -60,8 +56,8 @@ public class DataPanel extends JPanel {
     public void addField(Field f) {
         DataField anno = f.getAnnotation(DataField.class);
         Element e = null;
-        
-        if( Element.class.isAssignableFrom(anno.elementClass()) ) {
+
+        if (Element.class.isAssignableFrom(anno.elementClass())) {
             // if element type was specified explicitly, construct an instance of it
             try {
                 Constructor<Element> con = anno.elementClass().getConstructor(String.class, DataField.class);
@@ -69,9 +65,7 @@ public class DataPanel extends JPanel {
             } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(DataPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } 
-        
-        // default types per field class        
+        } // default types per field class        
         else if (String.class.isAssignableFrom(f.getType())) {
             e = new StringAsTextfieldElement(f.getName());
         }
@@ -96,26 +90,33 @@ public class DataPanel extends JPanel {
         @DataField(label = "lalala")
         String lala;
 
-        @DataField(label = "zazaza", elementClass = ListAsComboBoxElement.class, values = {"mein", "alter"})
-        String foo;
-        
         @DataField(label = "from provider", elementClass = ListAsComboBoxElement.class, valuesProvider = TestProvider.class)
         String fromProv;
 
         @Override
         public String toString() {
-            return "TestClass{" + "lala=" + lala + ", foo=" + foo + ", fromProv=" + fromProv + '}';
+            return "TestClass{" + "lala=" + lala + ", fromProv=" + fromProv + '}';
         }
-        
-        
 
-    }
-    
-    static class TestProvider implements ValuesProvider {
-        @Override
-        public Object[] get() {
-            return new Object[] { "a", "b", "c" };
+        static class TestProvider implements ValuesProvider {
+
+            @Override
+            public Object[] get() {
+                return new Object[]{"a", "b", "c"};
+            }
         }
+    }
+
+    private static class OtherClass {
+        @DataField(label = "zazaza", elementClass = ListAsComboBoxElement.class, values = {"mein", "alter"})
+        String foo;
+
+        @Override
+        public String toString() {
+            return "OtherClass{" + "foo=" + foo + '}';
+        }
+        
+        
     }
 
     public static void main(String[] args) {
@@ -125,21 +126,25 @@ public class DataPanel extends JPanel {
         TestClass tc = new TestClass();
         DataPanel p = new DataPanel("group", tc);
         x.add(p);
+        
+        OtherClass oc = new OtherClass();
+        DataPanel q = new DataPanel("other group", oc);
+        x.add(q);
 
         JButton b = new JButton("Ok");
         b.addActionListener(ae -> {
             p.updateFieldsFromValues();
+            q.updateFieldsFromValues();
+            
             System.err.println(tc);
-            x.setVisible(false);
+            System.err.println(oc);
+            
+            x.setVisible(false);            
             System.exit(0);
         });
         x.add(b);
 
-//        DataPanel p = new DataPanel("group");
-//        p.addField("lalalala", List.class, Arrays.asList("foo", "baa"));
-//        p.addField("zazazaza", List.class, Arrays.asList("mein", "alter"));
         x.pack();
         x.setVisible(true);
     }
-
 }
