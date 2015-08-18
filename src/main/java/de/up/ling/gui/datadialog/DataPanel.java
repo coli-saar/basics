@@ -25,14 +25,24 @@ import javax.swing.border.TitledBorder;
  */
 public class DataPanel extends JPanel {
 
-    private List<Element> elements;
-    private Object o;
+    private final List<Element> elements;
+    private final Object o;
 
-    public DataPanel(String title) {
+    public DataPanel(String title, Object o) {
         setBorder(new TitledBorder(title));
         setLayout(new GridLayout(0, 2));
 
         elements = new ArrayList<Element>();
+        this.o = o;
+        
+        Class c = o.getClass();
+
+        for (Field f : c.getDeclaredFields()) {
+            DataField anno = f.getAnnotation(DataField.class);
+            if (anno != null) {
+                addField(f);
+            }
+        }
     }
 
     private <E> void setField(Field f, E value) {
@@ -81,22 +91,6 @@ public class DataPanel extends JPanel {
         }
     }
 
-    public static DataPanel forObject(String title, Object o) {
-        DataPanel ret = new DataPanel(title);
-        ret.o = o;
-
-        Class c = o.getClass();
-
-        for (Field f : c.getDeclaredFields()) {
-            DataField anno = f.getAnnotation(DataField.class);
-            if (anno != null) {
-                ret.addField(f);
-            }
-        }
-
-        return ret;
-    }
-
     private static class TestClass {
 
         @DataField(label = "lalala")
@@ -129,7 +123,7 @@ public class DataPanel extends JPanel {
         x.setLayout(new GridLayout(0, 1));
 
         TestClass tc = new TestClass();
-        DataPanel p = DataPanel.forObject("group", tc);
+        DataPanel p = new DataPanel("group", tc);
         x.add(p);
 
         JButton b = new JButton("Ok");
