@@ -104,12 +104,24 @@ public class DataPanel extends JPanel {
 
         @DataField(label = "zazaza", elementClass = ListAsComboBoxElement.class, values = {"mein", "alter"})
         String foo;
+        
+        @DataField(label = "from provider", elementClass = ListAsComboBoxElement.class, valuesProvider = TestProvider.class)
+        String fromProv;
 
         @Override
         public String toString() {
-            return "TestClass{" + "lala=" + lala + ", foo=" + foo + '}';
+            return "TestClass{" + "lala=" + lala + ", foo=" + foo + ", fromProv=" + fromProv + '}';
         }
+        
+        
 
+    }
+    
+    static class TestProvider implements ValuesProvider {
+        @Override
+        public Object[] get() {
+            return new Object[] { "a", "b", "c" };
+        }
     }
 
     public static void main(String[] args) {

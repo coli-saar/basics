@@ -21,4 +21,5 @@ public @interface DataField {
     String label();
     Class elementClass() default Object.class;
     String[] values() default {};
+    Class<? extends ValuesProvider> valuesProvider() default ValuesProvider.class;
 }

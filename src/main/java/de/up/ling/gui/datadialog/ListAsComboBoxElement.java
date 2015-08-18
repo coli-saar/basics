@@ -18,7 +18,7 @@ public class ListAsComboBoxElement extends Element<String> {
     
     public ListAsComboBoxElement(String label, DataField df) {
         super(label);
-        box = new JComboBox<Object>(df.values());
+        box = new JComboBox<Object>(getValuesFromAnnotation(df));
     }
     
     public JComponent getComponent() {
