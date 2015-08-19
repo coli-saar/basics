@@ -13,7 +13,7 @@ import javax.swing.JTextField;
  *
  * @author koller
  */
-public class StringAsTextfieldElement extends Element<String> {
+class StringAsTextfieldElement extends Element<String> {
     private JTextField tf;
 
     public StringAsTextfieldElement(String label) {

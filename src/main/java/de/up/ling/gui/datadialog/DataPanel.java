@@ -7,14 +7,11 @@ package de.up.ling.gui.datadialog;
 
 import java.awt.GridLayout;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
@@ -23,38 +20,19 @@ import javax.swing.border.TitledBorder;
  *
  * @author koller
  */
-public class DataPanel extends JPanel {
-
+class DataPanel extends JPanel {
     private final List<Element> elements;
-    private final Object o;
 
-    public DataPanel(String title, Object o) {
+    public DataPanel(String title, List<DataPanelEntry> entries) {
         setBorder(new TitledBorder(title));
         setLayout(new GridLayout(0, 2));
 
         elements = new ArrayList<Element>();
-        this.o = o;
-
-        for (Field f : o.getClass().getDeclaredFields()) {
-            DataField anno = f.getAnnotation(DataField.class);
-            if (anno != null) {
-                addField(f);
-            }
-        }
+        entries.forEach(this::addEntry);
     }
 
-    private <E> void setField(Field f, E value) {
-        try {
-            if (o != null) {
-                f.set(o, value);
-            }
-        } catch (IllegalArgumentException | IllegalAccessException ex) {
-            Logger.getLogger(DataPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public void addField(Field f) {
-        DataField anno = f.getAnnotation(DataField.class);
+    private void addEntry(DataPanelEntry f) {
+        DataField anno = f.getDataField();
         Element e = null;
 
         if (Element.class.isAssignableFrom(anno.elementClass())) {
@@ -71,7 +49,7 @@ public class DataPanel extends JPanel {
         }
 
         if (e != null) {
-            e.setAction(x -> setField(f, x));
+            e.setAction(f);
             elements.add(e);
 
             add(new JLabel(anno.label()));
@@ -83,68 +61,5 @@ public class DataPanel extends JPanel {
         for (Element e : elements) {
             e.runAction();
         }
-    }
-
-    private static class TestClass {
-
-        @DataField(label = "lalala")
-        String lala;
-
-        @DataField(label = "from provider", elementClass = ListAsComboBoxElement.class, valuesProvider = TestProvider.class)
-        String fromProv;
-
-        @Override
-        public String toString() {
-            return "TestClass{" + "lala=" + lala + ", fromProv=" + fromProv + '}';
-        }
-
-        static class TestProvider implements ValuesProvider {
-
-            @Override
-            public Object[] get() {
-                return new Object[]{"a", "b", "c"};
-            }
-        }
-    }
-
-    private static class OtherClass {
-        @DataField(label = "zazaza", elementClass = ListAsComboBoxElement.class, values = {"mein", "alter"})
-        String foo;
-
-        @Override
-        public String toString() {
-            return "OtherClass{" + "foo=" + foo + '}';
-        }
-        
-        
-    }
-
-    public static void main(String[] args) {
-        JFrame x = new JFrame("hallo");
-        x.setLayout(new GridLayout(0, 1));
-
-        TestClass tc = new TestClass();
-        DataPanel p = new DataPanel("group", tc);
-        x.add(p);
-        
-        OtherClass oc = new OtherClass();
-        DataPanel q = new DataPanel("other group", oc);
-        x.add(q);
-
-        JButton b = new JButton("Ok");
-        b.addActionListener(ae -> {
-            p.updateFieldsFromValues();
-            q.updateFieldsFromValues();
-            
-            System.err.println(tc);
-            System.err.println(oc);
-            
-            x.setVisible(false);            
-            System.exit(0);
-        });
-        x.add(b);
-
-        x.pack();
-        x.setVisible(true);
     }
 }

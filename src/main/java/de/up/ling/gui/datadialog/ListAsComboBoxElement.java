@@ -13,7 +13,7 @@ import javax.swing.JComponent;
  *
  * @author koller
  */
-public class ListAsComboBoxElement extends Element<String> {
+class ListAsComboBoxElement extends Element<String> {
     private JComboBox<Object> box;
     
     public ListAsComboBoxElement(String label, DataField df) {

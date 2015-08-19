@@ -5,7 +5,6 @@
  */
 package de.up.ling.gui.datadialog;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
@@ -17,7 +16,7 @@ import javax.swing.JComponent;
  *
  * @author koller
  */
-public abstract class Element<F> {
+abstract class Element<F> {
 
     private String label;
     private Consumer<F> action;
