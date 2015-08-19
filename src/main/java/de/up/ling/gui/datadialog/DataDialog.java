@@ -8,6 +8,7 @@ package de.up.ling.gui.datadialog;
 
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -130,5 +131,44 @@ public class DataDialog extends JDialog {
                     System.err.println(tc);
                     System.err.println(oc);
                 });
+        
+//        DataPanelEntry x = new DataPanelEntry() {
+//            public String val = "val";
+//            
+//            @Override
+//            public DataField getDataField() {
+//                ConcreteDataField df = new ConcreteDataField("fooo label");
+//                df.setElementClass(String.class);
+//                return df;
+//            }
+//
+//            @Override
+//            public Object getValue() {
+//                return val;
+//            }
+//
+//            @Override
+//            public String getName() {
+//                return "foo name";
+//            }
+//
+//            @Override
+//            public Class getType() {
+//                return String.class;
+//            }
+//
+//            @Override
+//            public void accept(Object t) {
+//                val = (String) t;
+//            }
+//        };
+//        
+//        DataDialog.withValues(null, "dialog2", 
+//                Arrays.asList("group1"),
+//                Arrays.asList(Arrays.asList(x)),
+//                
+//                () -> {
+//                    System.err.println(x.getValue());
+//                });
     }
 }
