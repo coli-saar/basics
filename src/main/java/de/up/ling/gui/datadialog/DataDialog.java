@@ -111,11 +111,17 @@ public class DataDialog extends JDialog {
 
         @DataField(label = "zazaza", elementClass = ListAsComboBoxElement.class, values = {"mein", "alter"})
         String foo;
+        
+        @DataField(label = "check me")
+        Boolean boolField;
 
         @Override
         public String toString() {
-            return "OtherClass{" + "foo=" + foo + '}';
+            return "OtherClass{" + "foo=" + foo + ", boolField=" + boolField + '}';
         }
+
+        
+        
 
     }
 

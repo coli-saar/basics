@@ -6,32 +6,33 @@
 
 package de.up.ling.gui.datadialog;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JTextField;
 
 /**
  *
  * @author koller
  */
-class StringAsTextfieldElement extends Element<String> {
-    private JTextField tf;
-
-    public StringAsTextfieldElement(String label, DataField df, String originalValue) {
+public class BooleanAsCheckboxElement extends Element<Boolean> {
+    private JCheckBox box;
+    
+    public BooleanAsCheckboxElement(String label, DataField df, Boolean originalValue) {
         super(label);
-        tf = new JTextField();
+        box = new JCheckBox();
+        
         if( originalValue != null ) {
-            tf.setText(originalValue);
+            box.setSelected(originalValue);
         }
     }
 
     @Override
     public JComponent getComponent() {
-        return tf;
+        return box;
     }
 
     @Override
-    public String getValue() {
-        return tf.getText();
+    public Boolean getValue() {
+        return box.isSelected();
     }
     
 }

@@ -38,14 +38,16 @@ class DataPanel extends JPanel {
         if (Element.class.isAssignableFrom(anno.elementClass())) {
             // if element type was specified explicitly, construct an instance of it
             try {
-                Constructor<Element> con = anno.elementClass().getConstructor(String.class, DataField.class);
-                e = con.newInstance(f.getName(), anno);
+                Constructor<Element> con = anno.elementClass().getConstructor(String.class, DataField.class, f.getType());
+                e = con.newInstance(f.getName(), anno, f.getValue());
             } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(DataPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         } // default types per field class        
         else if (String.class.isAssignableFrom(f.getType())) {
-            e = new StringAsTextfieldElement(f.getName());
+            e = new StringAsTextfieldElement(f.getName(), anno, (String) f.getValue());
+        } else if( Boolean.class.isAssignableFrom(f.getType())) {
+            e = new BooleanAsCheckboxElement(f.getName(), anno, (Boolean) f.getValue());
         }
 
         if (e != null) {
