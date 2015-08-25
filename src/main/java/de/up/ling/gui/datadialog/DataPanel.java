@@ -23,12 +23,16 @@ import javax.swing.border.TitledBorder;
 class DataPanel extends JPanel {
     private final List<Element> elements;
 
-    public DataPanel(String title, List<DataPanelEntry> entries) {
+    private DataPanel(String title, List<DataPanelEntry> entries) {
         setBorder(new TitledBorder(title));
         setLayout(new GridLayout(0, 2));
 
         elements = new ArrayList<Element>();
         entries.forEach(this::addEntry);
+    }
+
+    DataPanel(DataPanelContainer container) {
+        this(container.getName(), container.getEntries());
     }
 
     private void addEntry(DataPanelEntry f) {

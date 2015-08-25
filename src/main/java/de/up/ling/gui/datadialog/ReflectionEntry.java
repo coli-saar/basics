@@ -7,8 +7,6 @@
 package de.up.ling.gui.datadialog;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,14 +57,25 @@ class ReflectionEntry implements DataPanelEntry {
         return f.getType();
     }
 
-    public static List<DataPanelEntry> forObject(Object o) {
-        List<DataPanelEntry> ret = new ArrayList<>();
+    public static DataPanelContainer forObject(String name, Object o) {
+        DataPanelContainer ret = new DataPanelContainer(name);
         for (Field f : o.getClass().getDeclaredFields()) {
             if (f.getAnnotation(DataField.class) != null) {
-                ret.add(new ReflectionEntry(f, o));
+                ret.addEntry(new ReflectionEntry(f, o));
             }
         }
+        
         return ret;
     }
+
+    @Override
+    public String toString() {
+        try {
+            return "<refl " + f.get(o) + ">";
+        } catch (Exception ex) {
+            return "<refl XXX>";
+        } 
+    }
+    
     
 }

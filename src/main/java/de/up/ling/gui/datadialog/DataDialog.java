@@ -8,10 +8,10 @@ package de.up.ling.gui.datadialog;
 
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -26,15 +26,15 @@ import javax.swing.SwingUtilities;
 public class DataDialog extends JDialog {
     private List<DataPanel> panels;
     
-    private DataDialog(Frame owner, String title, List<String> groupNames, List<List<DataPanelEntry>> entries, final Runnable callback) {
+    private DataDialog(Frame owner, String title, List<DataPanelContainer> entries, Consumer<List<DataPanelContainer>> callback) {
         super(owner);
         setTitle(title);
         
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         
         panels = new ArrayList<>();
-        for( int i = 0; i < groupNames.size(); i++ ) {
-            DataPanel p = new DataPanel(groupNames.get(i), entries.get(i));
+        for( int i = 0; i < entries.size(); i++ ) {
+            DataPanel p = new DataPanel(entries.get(i));
             panels.add(p);
             getContentPane().add(p);
         }
@@ -51,7 +51,7 @@ public class DataDialog extends JDialog {
            DataDialog.this.setVisible(false);
            
            // run callback in new thread
-           new Thread(callback).start();
+           new Thread(() -> { callback.accept(entries); }).start();
         });
         buttonsPanel.add(ok);
         buttonsPanel.add(Box.createRigidArea(new Dimension(10, 1)));
@@ -76,9 +76,9 @@ public class DataDialog extends JDialog {
      * @param entries
      * @param callback 
      */
-    public static void withValues(Frame owner, String title, List<String> groupNames, List<List<DataPanelEntry>> entries, Runnable callback) {
+    public static void withValues(Frame owner, String title, List<DataPanelContainer> entries, Consumer<List<DataPanelContainer>> callback) {
         SwingUtilities.invokeLater(() -> {
-           DataDialog dd = new DataDialog(owner, title, groupNames, entries, callback);
+           DataDialog dd = new DataDialog(owner, title, entries, callback);
            dd.setVisible(true);
         });
     }
@@ -130,11 +130,15 @@ public class DataDialog extends JDialog {
         OtherClass oc = new OtherClass();
 
         DataDialog.withValues(null, "dialog", 
-                Arrays.asList("group", "other group"),
-                Arrays.asList(ReflectionEntry.forObject(tc), ReflectionEntry.forObject(oc)),
+                Arrays.asList(ReflectionEntry.forObject("group", tc), ReflectionEntry.forObject("other group", oc)),
                 
-                () -> {
+                (dpc) -> {
+                    // access original objects if you still have them ...
                     System.err.println(tc);
+                    
+                    // ... or access by name in the DataPanelContainer
+                    System.err.println(dpc.get(0));
+                    
                     System.err.println(oc);
                 });
         
