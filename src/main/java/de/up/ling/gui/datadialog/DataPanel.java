@@ -5,6 +5,11 @@
  */
 package de.up.ling.gui.datadialog;
 
+import de.up.ling.gui.datadialog.entries.DataField;
+import de.up.ling.gui.datadialog.elements.Element;
+import de.up.ling.gui.datadialog.elements.BooleanAsCheckboxElement;
+import de.up.ling.gui.datadialog.elements.StringAsTextfieldElement;
+import de.up.ling.gui.datadialog.entries.DataPanelEntry;
 import java.awt.GridLayout;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -20,7 +25,7 @@ import javax.swing.border.TitledBorder;
  *
  * @author koller
  */
-class DataPanel extends JPanel {
+public class DataPanel extends JPanel {
     private final List<Element> elements;
 
     private DataPanel(String title, List<DataPanelEntry> entries) {
@@ -55,7 +60,7 @@ class DataPanel extends JPanel {
         }
 
         if (e != null) {
-            e.setAction(f);
+            e.setAction(f::setValue);
             elements.add(e);
 
             add(new JLabel(anno.label()));

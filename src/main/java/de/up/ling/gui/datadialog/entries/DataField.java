@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package de.up.ling.gui.datadialog;
+package de.up.ling.gui.datadialog.entries;
 
+import de.up.ling.gui.datadialog.ValuesProvider;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

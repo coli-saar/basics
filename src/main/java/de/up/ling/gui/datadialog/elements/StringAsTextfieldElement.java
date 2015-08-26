@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package de.up.ling.gui.datadialog;
+package de.up.ling.gui.datadialog.elements;
 
+import de.up.ling.gui.datadialog.entries.DataField;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
@@ -13,7 +14,7 @@ import javax.swing.JTextField;
  *
  * @author koller
  */
-class StringAsTextfieldElement extends Element<String> {
+public class StringAsTextfieldElement extends Element<String> {
     private JTextField tf;
 
     public StringAsTextfieldElement(String label, DataField df, String originalValue) {

@@ -6,6 +6,7 @@
 
 package de.up.ling.gui.datadialog;
 
+import de.up.ling.gui.datadialog.entries.DataPanelEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

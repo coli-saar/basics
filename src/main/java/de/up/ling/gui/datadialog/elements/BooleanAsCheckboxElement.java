@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package de.up.ling.gui.datadialog;
+package de.up.ling.gui.datadialog.elements;
 
+import de.up.ling.gui.datadialog.entries.DataField;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 

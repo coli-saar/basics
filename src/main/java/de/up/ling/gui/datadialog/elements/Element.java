@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.up.ling.gui.datadialog;
+package de.up.ling.gui.datadialog.elements;
 
+import de.up.ling.gui.datadialog.entries.DataField;
+import de.up.ling.gui.datadialog.ValuesProvider;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
@@ -16,7 +18,7 @@ import javax.swing.JComponent;
  *
  * @author koller
  */
-abstract class Element<F> {
+public abstract class Element<F> {
 
     private String label;
     private Consumer<F> action;

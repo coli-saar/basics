@@ -3,19 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.up.ling.gui.datadialog;
-
-import java.util.function.Consumer;
+package de.up.ling.gui.datadialog.entries;
 
 /**
  *
  * @author koller
  */
-public interface DataPanelEntry extends Consumer<Object> {
+public interface DataPanelEntry<E> {
 
     public DataField getDataField();
 
-    public Object getValue();
+    public E getValue();
+    
+    public void setValue(E o);
 
     public String getName();
 

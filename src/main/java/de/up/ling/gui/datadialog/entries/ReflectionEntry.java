@@ -4,8 +4,10 @@
  * and open the template in the editor.
  */
 
-package de.up.ling.gui.datadialog;
+package de.up.ling.gui.datadialog.entries;
 
+import de.up.ling.gui.datadialog.DataPanel;
+import de.up.ling.gui.datadialog.DataPanelContainer;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,7 +16,7 @@ import java.util.logging.Logger;
  *
  * @author koller
  */
-class ReflectionEntry implements DataPanelEntry {
+public class ReflectionEntry implements DataPanelEntry {
     Field f;
     Object o;
 
@@ -29,7 +31,7 @@ class ReflectionEntry implements DataPanelEntry {
     }
 
     @Override
-    public void accept(Object value) {
+    public void setValue(Object value) {
         try {
             f.set(o, value);
         } catch (IllegalArgumentException | IllegalAccessException ex) {

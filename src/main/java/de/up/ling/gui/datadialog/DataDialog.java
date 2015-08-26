@@ -6,6 +6,9 @@
 
 package de.up.ling.gui.datadialog;
 
+import de.up.ling.gui.datadialog.entries.DataField;
+import de.up.ling.gui.datadialog.elements.ListAsComboBoxElement;
+import de.up.ling.gui.datadialog.entries.ReflectionEntry;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.util.ArrayList;
@@ -85,20 +88,20 @@ public class DataDialog extends JDialog {
     
     
 
-    private static class TestClass {
+    public  static class TestClass {
 
         @DataField(label = "lalala")
-        String lala;
+        public String lala;
 
         @DataField(label = "from provider", elementClass = ListAsComboBoxElement.class, valuesProvider = TestProvider.class)
-        String fromProv;
+        public String fromProv;
 
         @Override
         public String toString() {
             return "TestClass{" + "lala=" + lala + ", fromProv=" + fromProv + '}';
         }
 
-        static class TestProvider implements ValuesProvider {
+        public static class TestProvider implements ValuesProvider {
 
             @Override
             public Object[] get() {
@@ -107,13 +110,13 @@ public class DataDialog extends JDialog {
         }
     }
 
-    private static class OtherClass {
+    public static class OtherClass {
 
         @DataField(label = "zazaza", elementClass = ListAsComboBoxElement.class, values = {"mein", "alter"})
-        String foo;
+        public String foo;
         
         @DataField(label = "check me")
-        Boolean boolField;
+        public Boolean boolField;
 
         @Override
         public String toString() {
