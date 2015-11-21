@@ -65,6 +65,13 @@ class TreeTest {
         assertEquals("f(h(c,d),g(k(l)))", t.substitute(fct).toString());
     }
     
+    @Test
+    public void testLispNoQuote() {
+        Tree t = p("foo(',', '``')");
+        String s = t.toLispStringNoQuotes();
+        assertEquals("(foo , ``)", s);
+    }
+    
     
     
     public static Tree c(Object label, List children) {

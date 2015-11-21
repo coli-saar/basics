@@ -25,7 +25,8 @@ public class Tree<E> implements Cloneable, Serializable {
     private List<Tree<E>> children;
     private boolean allowCaching = true;
     public static final Pattern NON_QUOTING_PATTERN = Pattern.compile("[a-zA-Z*+_]([a-zA-Z0-9_*+-]*)"); //   <ATOM : ["a"-"z", "A"-"Z", "*", "+", "_"] (["a"-"z", "A"-"Z", "_", "0"-"9", "-", "*", "+", "_"])* >
-
+    private static final Pattern NEVER_QUOTE = Pattern.compile(".*");
+    
     private Tree() {
     }
 
@@ -503,6 +504,18 @@ public class Tree<E> implements Cloneable, Serializable {
     public String toLispString() {
         StringBuilder buf = new StringBuilder();
         printAsLispString(buf, NON_QUOTING_PATTERN);
+        return buf.toString();
+    }
+    
+    /**
+     * Returns a string representation of the tree, in Lisp format. Node labels
+     * are never quoted. An example output is "(f (, ,) b)".
+     * 
+     * @return 
+     */
+    public String toLispStringNoQuotes() {
+        StringBuilder buf = new StringBuilder();
+        printAsLispString(buf, NEVER_QUOTE);
         return buf.toString();
     }
 
