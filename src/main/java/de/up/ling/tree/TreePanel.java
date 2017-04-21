@@ -85,6 +85,8 @@ public class TreePanel<E> extends JPanel implements MouseListener {
         nodeToTooltip = null;
 
         addMouseListener(this);
+        
+        setBackground(Color.white);
     }
 
     private void shiftRight(Tree<LabelAtPosition> tree, final int x) {
