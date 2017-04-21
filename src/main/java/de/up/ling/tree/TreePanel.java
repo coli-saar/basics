@@ -12,7 +12,10 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JFrame;
@@ -25,7 +28,15 @@ import javax.swing.ToolTipManager;
  *
  * @author koller
  */
-public class TreePanel<E> extends JPanel {
+public class TreePanel<E> extends JPanel implements MouseListener {
+    private static final Color[] MARKUP_COLORS = new Color[] { 
+        new Color(128, 135, 160, 100),
+        new Color(192, 212, 226),
+        new Color(206, 211, 194),
+        new Color(255, 211, 196),
+        new Color(239, 189, 189)
+    };
+    private int nextColorIndex = 0;
 
     private static final int XGAP = 10;
     private static final int YLEVEL = 50;
@@ -37,6 +48,10 @@ public class TreePanel<E> extends JPanel {
     private Graphics currentGraphics;
     private TooltipSource<E> tooltipSource;
     private Map<String, String> nodeToTooltip;
+
+    private boolean nodeSelectionEnabled = false;
+    private List<NodeSelectionListener> listeners = new ArrayList<NodeSelectionListener>();
+    private Map<Tree<E>, Color> markedNodes = new IdentityHashMap<Tree<E>, Color>();
 
     /*
      public static void main(String[] args) {
@@ -68,6 +83,8 @@ public class TreePanel<E> extends JPanel {
         this.tree = tree;
         layoutTree = null;
         nodeToTooltip = null;
+
+        addMouseListener(this);
     }
 
     private void shiftRight(Tree<LabelAtPosition> tree, final int x) {
@@ -162,6 +179,64 @@ public class TreePanel<E> extends JPanel {
         graphics.drawLine((int) (x1 + xshorten * diffx), (int) (y1 + ydiff), (int) (x2 - xshorten * diffx), (int) (y2 - ydiff));
     }
 
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            // left click
+
+            if (nodeSelectionEnabled) {
+                Tree<E> node = nodeUnderMousePointer(e.getPoint());
+
+                if (node != null) {
+                    if (markedNodes.containsKey(node)) {
+                        // unmark
+                        unmark(node);
+                    } else {
+                        // mark
+                        Color color = pickNextColor();
+                        mark(node, color);
+                    }
+                }
+            }
+        }
+    }
+    
+    private Color pickNextColor() {
+        return MARKUP_COLORS[(nextColorIndex++) % MARKUP_COLORS.length];
+    }
+
+    public void unmark(Tree<E> node) {
+        markedNodes.remove(node);
+        for (NodeSelectionListener list : listeners) {
+            list.nodeSelected(node, false, null);
+        }
+        repaint();
+    }
+
+    public void mark(Tree<E> node, Color color) {
+        markedNodes.put(node, color);
+        for (NodeSelectionListener lstr : listeners) {
+            lstr.nodeSelected(node, true, color);
+        }
+        repaint();
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
     public static interface TooltipSource<E> {
 
         public String makeTooltipLabel(Tree<E> tree);
@@ -177,7 +252,7 @@ public class TreePanel<E> extends JPanel {
         if (nodeToTooltip == null) {
             if (tooltipSource != null) {
                 nodeToTooltip = new HashMap<String, String>();
-                
+
                 layoutTree.dfs(new TreeVisitor<LabelAtPosition, Void, Void>() {
                     @Override
                     public Void combine(Tree<LabelAtPosition> node, List<Void> childrenValues) {
@@ -201,7 +276,12 @@ public class TreePanel<E> extends JPanel {
             return "";
         } else {
 //            ensureComputedTooltips();
-            
+
+            Tree<E> node = nodeUnderMousePointer(e.getPoint());
+            String ret = (node == null) ? null : tooltipSource.makeTooltipLabel(node);
+
+            /*
+
             String ret = layoutTree.dfs(new TreeVisitor<LabelAtPosition, Void, String>() {
                 @Override
                 public String combine(Tree<LabelAtPosition> node, List<String> childrenValues) {
@@ -221,7 +301,7 @@ public class TreePanel<E> extends JPanel {
                     }
                 }
             });
-
+             */
             if (ret == null) {
                 return "";
             } else {
@@ -230,11 +310,60 @@ public class TreePanel<E> extends JPanel {
         }
     }
 
+    /**
+     * Returns the node in the original tree below the mouse pointer.
+     *
+     * @param mousePosition
+     * @return
+     */
+    private Tree<E> nodeUnderMousePointer(Point mousePosition) {
+        return layoutTree.dfs(new TreeVisitor<LabelAtPosition, Void, Tree<E>>() {
+            @Override
+            public Tree<E> combine(Tree<LabelAtPosition> node, List<Tree<E>> childrenValues) {
+                // check whether mouse location was within a child => return tooltip from there
+                for (Tree<E> c : childrenValues) {
+                    if (c != null) {
+                        return c;
+                    }
+                }
+
+                Rectangle textRect = node.getLabel().getTextRect();
+                if (containsWithPadding(textRect, mousePosition, 0, 20)) {
+                    return node.getLabel().originalSubtree;
+                } else {
+                    return null;
+                }
+            }
+        });
+    }
+
     private static boolean containsWithPadding(Rectangle rect, Point point, int minpad, int maxpad) {
         return rect.getMinX() - minpad <= point.x
                 && rect.getMaxX() + maxpad >= point.x
                 && rect.getMinY() - minpad <= point.y
                 && rect.getMaxY() + maxpad >= point.y;
+    }
+
+    public static void main(String[] args) throws ParseException {
+        Tree<String> tree = TreeParser.parse("t83-join_drole__root__dsubcat__NP0_NP1_NP2_as___pos__VB__preterm__V__sgp1__as__srole__root__ssubcat__NP0_NP1_NP2_as___voice__act_(t3-Vinken_drole__0__pos__NNP__preterm__N__srole__0_(*NOP*_N_A,'t21-,_drole__adj__mdir__left__modifee__NP__pos_____preterm__Punct__srole__adj_'(*NOP*_Punct_A,*NOP*_NP_A)),*NOP*_V_A,t3-board_drole__1__pos__NN__preterm__N__srole__1_(*NOP*_N_A,t1-the_drole__adj__mdir__right__modifee__NP__pos__DT__preterm__D__srole__adj_(*NOP*_D_A,*NOP*_NP_A)),*NOP*_IN_A,t3-director_drole__2__pos__NN__preterm__N__srole__2_(*NOP*_N_A,t36-nonexecutive_drole__adj__mdir__right__modifee__NP__pos__JJ__preterm__A__srole__adj_(*NOP*_A_A,*NOP*_NP_A)),*NOP*_PP_A,'t65-Nov._drole__adj__mdir__left__modifee__VP__pos__NNP__preterm__N__srole__adj_'(*NOP*_N_A,t48-29_drole__adj__mdir__left__modifee__NP__pos__CD__preterm__N__srole__adj_(*NOP*_N_A,*NOP*_NP_A),*NOP*_VP_A),'t26-._drole__adj__mdir__left__modifee__S__pos_____preterm_____srole__adj_'('*NOP*_._A',*NOP*_S_A))");
+        JFrame f = new TreeFrame("Tree: " + tree.toString());
+        TreePanel<String> panel = new TreePanel<String>(tree);
+
+        Container contentPane = f.getContentPane();
+        contentPane.add(panel);
+
+        panel.setNodeSelectionEnabled(true);
+
+        f.pack();
+        f.setVisible(true);
+    }
+
+    public void setNodeSelectionEnabled(boolean nodeSelectionEnabled) {
+        this.nodeSelectionEnabled = nodeSelectionEnabled;
+    }
+    
+    public void addNodeSelectionListener(NodeSelectionListener listener) {
+        listeners.add(listener);
     }
 
     @Override
@@ -254,16 +383,27 @@ public class TreePanel<E> extends JPanel {
 
         graphics.translate(PADX, PADY);
 
+//        tree.dfs(new TreeVisitor<E, Void, Void>() {
+//            @Override
+//            public Void visit(Tree<E> node, Void data) {
+//                Rectangle r = nodeLabelRectangles.get(node);
+//                graphics.drawRect((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight());
+//                return null;
+//            }
+//        });
         layoutTree.dfs(new TreeVisitor<LabelAtPosition, Void, Void>() {
             @Override
             public Void visit(Tree<LabelAtPosition> node, Void data) {
                 LabelAtPosition l = node.getLabel();
                 Rectangle textRect = l.getTextRect();
 
-//                graphics.setColor(Color.yellow);
-//                graphics.fillRect(textRect.x, textRect.y, textRect.width, textRect.height);
-//                graphics.setColor(Color.black);
-//                graphics.drawRect(l.left, l.top, l.width(), l.height());
+                Color markColor = markedNodes.get(node.getLabel().originalSubtree);
+                if (markColor != null) {
+                    graphics.setColor(markColor);
+                    graphics.fillRect(textRect.x-PADX/2, textRect.y-PADX/2, textRect.width+PADX, textRect.height+PADX);
+                    graphics.setColor(Color.black);
+                }
+
                 graphics.drawString(l.label, (int) textRect.getMinX(), (int) textRect.getMaxY());
 
                 for (Tree<LabelAtPosition> childT : node.getChildren()) {
