@@ -9,7 +9,6 @@ package de.saar.basic;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Collection;
 
 /**
  * A collection of various utility functions for strings. 
@@ -26,7 +25,7 @@ public class StringTools {
      * @param separator a string that is inserted between any two members of the list
      * @return the joined string
      */
-    public static <E> String join(Collection<E> strings, String separator) {
+    public static <E> String join(Iterable<E> strings, String separator) {
         boolean first = true;
         StringBuffer sb = new StringBuffer();
 
