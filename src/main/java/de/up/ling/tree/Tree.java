@@ -328,6 +328,7 @@ public class Tree<E> implements Cloneable, Serializable {
      *
      * @param selector
      * @param start
+     * @param separator
      * @return
      */
     public Tree<E> selectWithSeparators(String selector, int start, String separator) {
@@ -353,6 +354,17 @@ public class Tree<E> implements Cloneable, Serializable {
     public Collection<String> getAllPaths() {
         return getAllPathsBelow("");
     }
+    
+    /**
+     * Returns a collection of all paths that lead to nodes in the tree. See
+     * #select for an explanation of paths.
+     *
+     * @param separator
+     * @return
+     */
+    public Collection<String> getAllPathsWithSeparator(String separator) {
+        return getAllPathsBelowWithSeparator("", separator);
+    }
 
     /**
      * Returns a collection of all paths to nodes in this tree that start with
@@ -363,11 +375,20 @@ public class Tree<E> implements Cloneable, Serializable {
      * @return
      */
     public Collection<String> getAllPathsBelow(String selector) {
-        return getAllPathsBelow(selector, new Predicate<Tree<E>>() {
-            public boolean apply(Tree<E> t) {
-                return true;
-            }
-        });
+        return getAllPathsBelow(selector, (Tree<E> t) -> true);
+    }
+    
+    /**
+     * Returns a collection of all paths to nodes in this tree that start with
+     * the given prefix. In other words, returns the set of all nodes below the
+     * given node.
+     *
+     * @param selector
+     * @param separator
+     * @return
+     */
+    public Collection<String> getAllPathsBelowWithSeparator(String selector, String separator) {
+        return getAllPathsBelowWithSeparator(selector, separator, (Tree<E> t) -> true);
     }
 
     /**
@@ -376,16 +397,29 @@ public class Tree<E> implements Cloneable, Serializable {
      * @return
      */
     public Collection<String> getAllPathsToLeaves() {
-        return getAllPathsBelow("", new Predicate<Tree<E>>() {
-            public boolean apply(Tree<E> t) {
-                return t.getChildren().isEmpty();
-            }
-        });
+        return getAllPathsBelow("", (Tree<E> t) -> t.getChildren().isEmpty());
+    }
+    
+    /**
+     * Returns a collection of all paths that lead to leaves of this tree.
+     *
+     * @param separator
+     * @return
+     */
+    public Collection<String> getAllPathsToLeavesWithSeparator(String separator) {
+        return getAllPathsBelowWithSeparator("", separator, (Tree<E> t) -> t.getChildren().isEmpty());
     }
 
     private Collection<String> getAllPathsBelow(String selector, Predicate<Tree<E>> test) {
-        final List<String> ret = new ArrayList<String>();
+        final List<String> ret = new ArrayList<>();
         select(selector, 0).collectPathsBelowVisit(selector, test, ret);
+        return ret;
+    }
+    
+    private Collection<String> getAllPathsBelowWithSeparator(String selector,
+            String separator, Predicate<Tree<E>> test) {
+        final List<String> ret = new ArrayList<>();
+        selectWithSeparators(selector, 0, separator).collectPathsBelowVisitWithSeparator(selector, separator, test, ret);
         return ret;
     }
 
@@ -396,6 +430,18 @@ public class Tree<E> implements Cloneable, Serializable {
 
         for (int i = 0; i < children.size(); i++) {
             children.get(i).collectPathsBelowVisit(path + i, test, accu);
+        }
+    }
+    
+    private void collectPathsBelowVisitWithSeparator(String path, String separator,
+            Predicate<Tree<E>> test, List<String> accu) {
+        if (test.apply(this)) {
+            accu.add(path);
+        }
+
+        for (int i = 0; i < children.size(); i++) {
+            String sepHere = path.equals("") ? "" : separator; //don't add separator at the start
+            children.get(i).collectPathsBelowVisitWithSeparator(path + sepHere + i, separator, test, accu);
         }
     }
 
