@@ -332,7 +332,7 @@ public class Tree<E> implements Cloneable, Serializable {
      * @return
      */
     public Tree<E> selectWithSeparators(String selector, int start, String separator) {
-        String[] selectors = selector.split(separator);
+        String[] selectors = selector.equals("") ? new String[0] : selector.split(separator);
         return selectFromArray(selectors, start);
     }
     
