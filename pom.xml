@@ -62,6 +62,20 @@
 	</executions>
       </plugin>
 
+       <plugin>
+       <groupId>org.codehaus.gmavenplus</groupId>
+       <artifactId>gmavenplus-plugin</artifactId>
+       <version>1.5</version>
+       <executions>
+           <execution>
+               <goals>
+                   <goal>addTestSources</goal>
+                   <goal>testCompile</goal>
+               </goals>
+           </execution>
+       </executions>
+       </plugin>
+       <!--
       <plugin>
 	<groupId>org.codehaus.groovy.maven</groupId>
 	<artifactId>gmaven-plugin</artifactId>
@@ -73,7 +87,8 @@
 	    </goals>
 	  </execution>
 	</executions>
-      </plugin>
+	</plugin>
+	-->
 
       <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
