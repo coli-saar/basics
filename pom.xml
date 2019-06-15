@@ -75,20 +75,6 @@
            </execution>
        </executions>
        </plugin>
-       <!--
-      <plugin>
-	<groupId>org.codehaus.groovy.maven</groupId>
-	<artifactId>gmaven-plugin</artifactId>
-	<executions>
-	  <execution>
-	    <goals>
-	      <goal>generateTestStubs</goal>
-	      <goal>testCompile</goal>
-	    </goals>
-	  </execution>
-	</executions>
-	</plugin>
-	-->
 
       <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
@@ -97,11 +83,20 @@
 	<configuration>
 	  <additionalparam>-Xdoclint:none</additionalparam>
 	</configuration>
+	<executions>
+	  <execution>
+	    <id>attach-javadocs</id>
+	    <goals>
+              <goal>jar</goal>
+	    </goals>
+	  </execution>
+	</executions>
 <!--	<configuration>
 	  <detectLinks>true</detectLinks>
 	</configuration>
 -->
       </plugin>
+
 
       <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
