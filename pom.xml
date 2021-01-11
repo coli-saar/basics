@@ -126,45 +126,8 @@
       <url>http://tcl.ling.uni-potsdam.de/artifactory/release</url>
     </repository>
   </distributionManagement>
-
-  <!--
-      <distributionManagement>
-      <repository>
-      <id>tcl-repository</id>
-      <name>Potsdam TCL Maven repository</name>
-      <url>scpexe://emma.ling.uni-potsdam.de//projects/webprojects/tcl/maven2/releases</url>
-      </repository>
-
-<site>
-<id>basics-site</id>
-<name>Potsdam Basics website</name>
-<url>scpexe://emma.ling.uni-potsdam.de//projects/webprojects/tcl/basics</url>
-</site>
-
-<downloadUrl>http://www.ling.uni-potsdam.de/tcl/maven2/releases</downloadUrl>
-</distributionManagement>
-
-<repositories>
-<repository>
-<id>jboss</id>
-<url>http://repository.jboss.org/maven2</url>
-</repository>
-</repositories>
-
-  -->
-
-      <scm>
-      <developerConnection>scm:hg:https://bitbucket.org/tclup/basics</developerConnection>
-        <tag>HEAD</tag>
-  </scm>
-
-<!--
-
   <scm>
-    <connection>scm:hg:.</connection>
-    <developerConnection>scm:hg:.</developerConnection>
-    <url>scm:hg:.</url>
-    <tag>basics-1.2.36</tag>
+    <developerConnection>scm:git:https://github.com/coli-saar/basics</developerConnection>
+    <tag>HEAD</tag>
   </scm>
--->
 </project>

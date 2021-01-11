@@ -22,6 +22,8 @@ public class SortedMergedStream<E> implements Stream<E> {
     private List<Stream<E>> streams;
     private Comparator<Stream<E>> streamComparator;
     private boolean finished = false;
+    /** set to true by sort(), to false by all operations modifying the stream */
+    private boolean sorted = false;
 
     public SortedMergedStream(Comparator<E> comparator) {
         streams = new ArrayList<Stream<E>>();
@@ -30,6 +32,7 @@ public class SortedMergedStream<E> implements Stream<E> {
 
     public void addStream(Stream<E> stream) {
         streams.add(stream);
+        sorted = false;
     }
 
     public E peek() {
@@ -46,6 +49,8 @@ public class SortedMergedStream<E> implements Stream<E> {
             return null;
         } else {
             sort();
+            // after the pop operation below, this stream will not be sorted anymore.
+            sorted = false;
             return streams.get(0).pop();
         }
     }
@@ -68,11 +73,15 @@ public class SortedMergedStream<E> implements Stream<E> {
     }
 
     private void sort() {
+        if (sorted) {
+            return;
+        }
         Collections.sort(streams, streamComparator);
+        sorted = true;
     }
     
     private class StreamComparator implements Comparator<Stream<E>> {
-        private Comparator<E> underlyingComparator;
+        private final Comparator<E> underlyingComparator;
 
         public StreamComparator(Comparator<E> underlyingComparator) {
             this.underlyingComparator = underlyingComparator;
