@@ -368,16 +368,26 @@ public class TreePanel<E> extends JPanel implements MouseListener {
         listeners.add(listener);
     }
 
-    @Override
-    public void paintComponent(final Graphics grphcs) {
-        final Graphics2D graphics = (Graphics2D) grphcs;
-        currentGraphics = graphics;
+    private boolean computeLayout() {
+        // Can't call this before paintComponent, because the layout algorithm
+        // requires the current font metrics, and these are only available
+        // once we have a Graphics context.
+        
         boolean firstUse = false;
 
         if (layoutTree == null) {
             layoutTree = layout(tree);
             firstUse = true;
         }
+
+        return firstUse;
+    }
+
+    @Override
+    public void paintComponent(final Graphics grphcs) {
+        final Graphics2D graphics = (Graphics2D) grphcs;
+        currentGraphics = graphics;
+        boolean firstUse = computeLayout();
 
         graphics.setColor(Color.white);
         graphics.fillRect(0, 0, layoutTree.getLabel().width() + 2 * PADX, layoutTree.getLabel().height() + 2 * PADY);
@@ -419,7 +429,12 @@ public class TreePanel<E> extends JPanel implements MouseListener {
 
         if (firstUse) {
             revalidate();
-            ((JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, this)).pack();
+            
+            // If the component is not part of a frame, let's not call pack on one.
+            JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, this);
+            if( frame != null ) {
+                frame.pack();
+            }
         }
     }
 
